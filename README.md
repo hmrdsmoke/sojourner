@@ -82,6 +82,36 @@ cargo run
 Without the model and runtime the app still opens and reads as a book; only
 the voice is unavailable, and it says so.
 
+## Installing
+
+To have it on the desktop like any other app — in the launcher, with its
+icon, opening where you left off:
+
+```
+chmod +x tools/install.sh
+tools/install.sh              # builds the release binary, installs under ~/.local
+tools/install.sh --remove     # takes it out again
+```
+
+The script puts the binary in `~/.local/bin`, the desktop entry and icon
+where the desktop looks for them, and the voice's files (model, ONNX
+Runtime, espeak-ng data) under `~/.local/share/sojourner`, which is where
+the app looks when it isn't run from a checkout. `PREFIX=/usr/local` (with
+`sudo`) installs system-wide; `DESTDIR` stages for a package.
+
+## Installing it as an app
+
+```
+tools/install.sh            # builds the release binary and installs under ~/.local
+tools/install.sh --remove   # takes it out again
+```
+
+That puts the binary in `~/.local/bin`, a launcher entry and the icon (the
+cover) where the desktop finds them, and the voice's files under
+`~/.local/share/sojourner`, which is where the app looks for them when it
+isn't run from a checkout (`src/voice/files.rs`). `PREFIX=/usr DESTDIR=…`
+lays the same files out for a package.
+
 ## Name
 
 A sojourner is one who stays a while in a place that is not their home.

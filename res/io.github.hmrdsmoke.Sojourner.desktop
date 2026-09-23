@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Sojourner
+GenericName=Bible
+Comment=The Bible as a book that reads to you
+Exec=sojourner
+Icon=io.github.hmrdsmoke.Sojourner
+Terminal=false
+Categories=Education;Literature;
+Keywords=Bible;scripture;World English Bible;reader;
+StartupNotify=true

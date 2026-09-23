@@ -52,8 +52,8 @@ use cosmic::iced::keyboard::{self, key::Named};
 use cosmic::iced::futures::Stream;
 use cosmic::iced::widget::scrollable::{scroll_by, scroll_to, AbsoluteOffset, Direction, Scrollbar};
 use cosmic::iced::widget::text::{Rich, Span};
-use cosmic::iced::widget::{rich_text, span, Id};
-use cosmic::iced::{self, Border, Color, Event, Font, Length, Pixels, Shadow, Size, Subscription, Vector};
+use cosmic::iced::widget::{mouse_area, rich_text, span, stack, Id};
+use cosmic::iced::{self, window, Border, Color, Event, Font, Length, Pixels, Shadow, Size, Subscription, Vector};
 use cosmic::widget::{button, column, container, divider, flex_row, icon, responsive, row, scrollable, space, text};
 use cosmic::{Application, ApplicationExt, Element};
 use serde::{Deserialize, Serialize};
@@ -118,6 +118,9 @@ pub struct Sojourner {
     leaves: HashMap<(usize, usize), Vec<Leaf>>,
     /// Whether the Contents sidebar is open on the left.
     contents_open: bool,
+    /// The window's size, as last reported, for deciding whether the
+    /// Contents sidebar can sit beside the sheet or must lie over the desk.
+    window: Size,
     /// The book whose chapter numbers are unfolded in the Contents sidebar.
     expanded: Option<usize>,
     /// Where the reader has peeked, in order. `trail[0]` is what they clicked
@@ -202,6 +205,8 @@ pub enum Message {
     TextSize(f32),
     /// Open or close the Contents sidebar.
     ToggleContents,
+    /// The window was resized (or opened) to this size.
+    WindowResized(Size),
     /// Escape, or the drawer's close button: close the trail if it is open,
     /// else the Contents sidebar.
     ClosePanel,
@@ -605,6 +610,7 @@ impl Application for Sojourner {
             text_size,
             leaves: HashMap::new(),
             contents_open: false,
+            window: window_size(),
             expanded: None,
             trail: Vec::new(),
             reader: None,
@@ -676,7 +682,8 @@ impl Application for Sojourner {
                 _ => None,
             }
         });
-        Subscription::batch([keys, Subscription::run(voice_thread)])
+        let resizes = window::resize_events().map(|(_, size)| Message::WindowResized(size));
+        Subscription::batch([keys, resizes, Subscription::run(voice_thread)])
     }
 
     /// The header stays quiet: the Contents toggle at the left, the reading
@@ -755,13 +762,26 @@ impl Application for Sojourner {
         let page_area = page_area.push(responsive(move |size| self.desk(size)));
         let desk = container(page_area).width(Length::Fill).height(Length::Fill).class(desk_style(&palette));
 
-        if self.contents_open {
+        if !self.contents_open {
+            return desk.into();
+        }
+        if self.contents_beside() {
+            // Room for both: the sidebar sits beside the sheet.
             row![self.contents(), divider::vertical::light(), desk]
                 .width(Length::Fill)
                 .height(Length::Fill)
                 .into()
         } else {
-            desk.into()
+            // Not enough room: the sidebar lies over the desk like a drawer,
+            // the sheet stays where it is, and a click on the desk beside it
+            // (or a chapter chosen from it, or Escape) closes it.
+            let drawer = container(self.contents()).height(Length::Fill).class(drawer_style());
+            let beside = mouse_area(container(space::horizontal()).width(Length::Fill).height(Length::Fill))
+                .on_press(Message::ClosePanel);
+            stack![desk, row![drawer, beside].width(Length::Fill).height(Length::Fill)]
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .into()
         }
     }
 }
@@ -820,6 +840,10 @@ impl Sojourner {
                 }
                 Self::back_to_top()
             }
+            Message::WindowResized(size) => {
+                self.window = size;
+                Task::none()
+            }
             Message::ToggleContents => {
                 self.contents_open = !self.contents_open;
                 if self.contents_open {
@@ -842,8 +866,12 @@ impl Sojourner {
                 Task::none()
             }
             Message::GoTo(position) => {
-                // The sidebar stays open: turning through chapters from it
-                // is what it is for.
+                // The sidebar stays open when it sits beside the sheet:
+                // turning through chapters from it is what it is for. Lying
+                // over the sheet, it closes to show what was chosen.
+                if !self.contents_beside() {
+                    self.contents_open = false;
+                }
                 self.at = position;
                 self.leaves_of(self.at.slot, self.at.page);
                 Self::back_to_top()
@@ -1105,6 +1133,32 @@ impl Sojourner {
             .class(paper)
             .into()
     }
+}
+
+impl Sojourner {
+    /// Whether the window is wide enough for the Contents sidebar to sit
+    /// beside the whole sheet (the arrows may go; the sheet may not).
+    fn contents_beside(&self) -> bool {
+        self.window.width >= CONTENTS_WIDTH + 1.0 + SHEET_WIDTH + 3.0 * DESK_AIR
+    }
+}
+
+/// The Contents sidebar as a drawer over the desk: the window's own
+/// background, with a shadow along its edge.
+fn drawer_style() -> cosmic::theme::Container<'static> {
+    cosmic::theme::Container::custom(|theme| {
+        let mut style = cosmic::theme::Container::background(theme.cosmic(), false);
+        style.shadow = Shadow { color: Color { a: 0.3, ..Color::BLACK }, offset: Vector::new(2.0, 0.0), blur_radius: 12.0 };
+        style
+    })
+}
+
+/// The window to open with: one sheet whole, the arrows beside it and a
+/// little desk around, under the header bar.
+fn window_size() -> Size {
+    let width = SHEET_WIDTH + 2.0 * (ARROW_WIDTH + DESK_AIR) + 3.0 * DESK_AIR;
+    let height = SHEET_HEIGHT + 3.0 * DESK_AIR + 48.0;
+    Size::new(width, height)
 }
 
 /// The desk: a plain surface under the sheet, in Sojourner's own colour.
@@ -1582,11 +1636,11 @@ fn voice_thread() -> impl Stream<Item = Message> {
 }
 
 fn main() -> cosmic::iced::Result {
-    // A window that shows one sheet whole, with the arrows beside it and a
-    // little desk around: the header bar is above. Resizing is allowed; a
-    // smaller window scrolls the sheet, a larger one gets more desk.
-    let width = SHEET_WIDTH + 2.0 * (ARROW_WIDTH + DESK_AIR) + 3.0 * DESK_AIR;
-    let height = SHEET_HEIGHT + 3.0 * DESK_AIR + 48.0;
-    let settings = cosmic::app::Settings::default().size(Size::new(width, height));
+    // The book face goes into the text engine before the window opens, so
+    // the first sheet is set and drawn in it.
+    sojourner::page::load_book_face();
+    // Resizing is allowed; a smaller window scrolls the sheet, a larger one
+    // gets more desk.
+    let settings = cosmic::app::Settings::default().size(window_size());
     cosmic::app::run::<Sojourner>(settings, ())
 }

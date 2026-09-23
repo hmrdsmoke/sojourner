@@ -729,20 +729,9 @@ impl Application for Sojourner {
         Some(context_drawer::context_drawer(self.trail_panel(), Message::ClosePanel).title(title))
     }
 
+    /// The desk with the sheet on it — the cover, while the text is still
+    /// being opened — and the Contents sidebar beside or over it.
     fn view(&self) -> Element<'_, Self::Message> {
-        if self.library.is_none() {
-            let notice = match &self.error {
-                Some(error) => format!("Couldn't open the text: {error}"),
-                None => "Opening the World English Bible…".to_string(),
-            };
-            return container(text(notice).size(18))
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .center_x(Length::Fill)
-                .center_y(Length::Fill)
-                .into();
-        }
-
         let palette = Palette::current();
         let mut page_area = column![].width(Length::Fill).height(Length::Fill);
         if let Some(notice) = &self.voice_notice {
@@ -1014,8 +1003,8 @@ impl Sojourner {
     /// both ways when the width is too.
     fn desk(&self, room: Size) -> Element<'_, Message> {
         let at_front = self.at == Position { slot: 0, page: 0, leaf: 0 };
-        let at_back = {
-            let last = self.shelf.len().saturating_sub(1);
+        let at_back = self.shelf.is_empty() || {
+            let last = self.shelf.len() - 1;
             self.at.slot == last
                 && self.at.page + 1 >= self.pages(last)
                 && self.leaves.get(&(self.at.slot, self.at.page)).is_none_or(|l| self.at.leaf + 1 >= l.len())
@@ -1073,10 +1062,19 @@ impl Sojourner {
     fn sheet(&self) -> Element<'_, Message> {
         let palette = Palette::current();
         let paper = paper_style(&palette);
-        let Some(lib) = &self.library else { return space::horizontal().into() };
+        let Some(lib) = &self.library else {
+            // The text is still being opened (a moment in a release build,
+            // a few seconds in a debug one): the cover, with a word at its
+            // foot — or, if the text couldn't be opened, what went wrong.
+            let note = match &self.error {
+                Some(error) => format!("Couldn't open the text: {error}"),
+                None => "Opening the World English Bible…".to_string(),
+            };
+            return cover(&palette, Some(&note));
+        };
 
         let Slot::Book(i) = self.shelf[self.at.slot] else {
-            return cover(&palette);
+            return cover(&palette, None);
         };
         let book = &lib.bible.books[i];
         let leaves = self.leaves.get(&(self.at.slot, self.at.page));
@@ -1182,10 +1180,12 @@ fn paper_style(palette: &Palette) -> cosmic::theme::Container<'static> {
 /// a title page. Oxblood cloth, the title stamped in gold inside a double
 /// rule, the app's name at the foot like an imprint; the same by day and by
 /// night, since a cover is a cover. Everything on it is either the app's
-/// name or a fact recorded in assets/SOURCES.md.
-fn cover<'a>(palette: &Palette) -> Element<'a, Message> {
+/// name or a fact recorded in assets/SOURCES.md — plus, while the text is
+/// being opened, a word saying so.
+fn cover<'a>(palette: &Palette, note: Option<&str>) -> Element<'a, Message> {
     let gold = palette.gold;
     let quiet = Color { a: 0.8, ..gold };
+    let faint = Color { a: 0.55, ..gold };
     let rule = |width: f32| container(space::horizontal()).width(width).height(1.5).class(fill_style(gold));
 
     let stamped = column![
@@ -1199,7 +1199,9 @@ fn cover<'a>(palette: &Palette) -> Element<'a, Message> {
         text("Updated edition").size(15).font(SERIF).class(quiet),
         space::vertical().height(Length::FillPortion(6)),
         text("Sojourner").size(15).font(SERIF).class(quiet),
-        space::vertical().height(10),
+        space::vertical().height(8),
+        text(note.unwrap_or("").to_string()).size(13).font(SERIF_ITALIC).class(faint),
+        space::vertical().height(6),
     ]
     .align_x(iced::Alignment::Center)
     .width(Length::Fill)

@@ -24,6 +24,8 @@ rodio = { version = "0.22", default-features = false, features = ["playback"] }
 # (src/voice/phonemes.rs); serde_json reads the voice's configuration.
 espeak-rs-sys = "0.2"
 serde_json = "1"
+# The place the reader left off, saved through cosmic-config (as RON).
+serde = { version = "1", features = ["derive"] }
 
 [dependencies.libcosmic]
 git = "https://github.com/pop-os/libcosmic.git"

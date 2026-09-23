@@ -29,6 +29,10 @@
 //! while its page is showing runs on into the next. "Read from here" in the
 //! trail panel starts at any verse.
 //!
+//! The place the reader left off is remembered (through cosmic-config's
+//! state store, as book code and chapter, so it survives updates to the
+//! text), and the book opens there next time.
+//!
 //! True fixed-size page flipping (a screenful per page) is a later step; for
 //! now a long chapter scrolls.
 
@@ -36,6 +40,7 @@ use std::sync::Arc;
 
 use cosmic::app::context_drawer::{self, ContextDrawer};
 use cosmic::app::{Core, Task};
+use cosmic::cosmic_config::{Config, ConfigGet, ConfigSet};
 use cosmic::iced::core::text::LineHeight;
 use cosmic::iced::keyboard::{self, key::Named};
 use cosmic::iced::futures::Stream;
@@ -45,6 +50,7 @@ use cosmic::iced::widget::{rich_text, span, Id};
 use cosmic::iced::{self, Color, Event, Font, Length, Pixels, Size, Subscription};
 use cosmic::widget::{button, column, container, divider, flex_row, icon, row, scrollable, space, text};
 use cosmic::{Application, ApplicationExt, Element};
+use serde::{Deserialize, Serialize};
 
 // The library's module is also called `text`, which collides with the text
 // *widget*; call the library side `scripture` in this file.
@@ -130,6 +136,16 @@ pub struct Sojourner {
     /// A line about the voice for the person to see: that it is loading, or
     /// why it can't read.
     voice_notice: Option<String>,
+}
+
+/// Where the reader left off, as it is saved: the publisher's book code
+/// ("JHN") and the chapter number, or an empty code for the title page.
+/// Codes and numbers rather than positions, so the place survives a change
+/// of edition or shelf order.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+struct Place {
+    book: String,
+    chapter: u32,
 }
 
 /// A chapter being read aloud.
@@ -399,6 +415,51 @@ impl Sojourner {
         Self::back_to_top()
     }
 
+    /// The state store the place is kept in: cosmic-config's state directory,
+    /// under the app id. None if there is no such directory to be had.
+    fn place_store() -> Option<Config> {
+        Config::new_state(Self::APP_ID, 1).ok()
+    }
+
+    /// The place the page shows, in saved form.
+    fn place(&self) -> Option<Place> {
+        let lib = self.library.as_ref()?;
+        Some(match self.shelf[self.at.slot] {
+            Slot::Title => Place { book: String::new(), chapter: 0 },
+            Slot::Book(i) => Place {
+                book: lib.bible.books[i].code.clone(),
+                chapter: lib.bible.books[i].chapters.get(self.at.page).map_or(0, |c| c.number),
+            },
+        })
+    }
+
+    /// Save the place the page shows. Failures are not worth stopping for:
+    /// the book still opens, just at the title page next time.
+    fn remember_place(&self) {
+        if let (Some(store), Some(place)) = (Self::place_store(), self.place()) {
+            if let Err(e) = store.set("place", place) {
+                eprintln!("couldn't save the place: {e}");
+            }
+        }
+    }
+
+    /// The saved place as a position on the shelf, if it still exists.
+    fn saved_position(&self) -> Option<Position> {
+        let place: Place = Self::place_store()?.get("place").ok()?;
+        let lib = self.library.as_ref()?;
+        if place.book.is_empty() {
+            return Some(Position { slot: 0, page: 0 });
+        }
+        let (i, book) = lib.bible.books.iter().enumerate().find(|(_, b)| b.code == place.book)?;
+        let slot = self.shelf.iter().position(|s| *s == Slot::Book(i))?;
+        let page = if book.chapters.is_empty() {
+            0
+        } else {
+            book.chapters.iter().position(|c| c.number == place.chapter)?
+        };
+        Some(Position { slot, page })
+    }
+
     /// The breadcrumb text for a stop.
     fn stop_label(&self, stop: &Stop) -> String {
         let Some(lib) = &self.library else {
@@ -491,12 +552,177 @@ impl Application for Sojourner {
         (app, Task::batch([title, load]))
     }
 
+    /// Every message goes through `handle`; if it moved the page, the new
+    /// place is saved.
     fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
+        let before = self.at;
+        let task = self.handle(message);
+        if self.at != before {
+            self.remember_place();
+        }
+        task
+    }
+
+    /// Left/Right (and PageUp/PageDown) turn pages; Up/Down scroll the one
+    /// you're on; Space plays or pauses; Shift+Up/Down go back a verse or
+    /// skip one. Only key presses no widget claimed are considered, so
+    /// typing in a search box later won't turn pages. The second
+    /// subscription is the voice thread, which lives as long as the window.
+    fn subscription(&self) -> Subscription<Self::Message> {
+        let keys = iced::event::listen_with(|event, status, _window| {
+            if status != iced::event::Status::Ignored {
+                return None;
+            }
+            let Event::Keyboard(keyboard::Event::KeyPressed { key, modifiers, .. }) = event else {
+                return None;
+            };
+            match key {
+                // The space bar arrives as the character it types.
+                keyboard::Key::Character(c) if c == " " => Some(Message::PlayPause),
+                keyboard::Key::Named(key) => match key {
+                    Named::ArrowRight | Named::PageDown => Some(Message::NextPage),
+                    Named::ArrowLeft | Named::PageUp => Some(Message::PreviousPage),
+                    Named::ArrowDown if modifiers.shift() => Some(Message::NextVerse),
+                    Named::ArrowUp if modifiers.shift() => Some(Message::PreviousVerse),
+                    Named::ArrowDown => Some(Message::ScrollPage(SCROLL_STEP)),
+                    Named::ArrowUp => Some(Message::ScrollPage(-SCROLL_STEP)),
+                    Named::Escape => Some(Message::ClosePanel),
+                    _ => None,
+                },
+                _ => None,
+            }
+        });
+        Subscription::batch([keys, Subscription::run(voice_thread)])
+    }
+
+    /// The Contents toggle and Previous sit at the left of the header bar,
+    /// Next at the right, with the title between them, so the page itself
+    /// stays nothing but text.
+    fn header_start(&self) -> Vec<Element<'_, Self::Message>> {
+        if self.library.is_none() {
+            return Vec::new();
+        }
+        vec![
+            row![
+                button::icon(icon::from_name("open-menu-symbolic")).on_press(Message::ToggleContents),
+                button::standard("‹ Previous").on_press(Message::PreviousPage),
+            ]
+            .spacing(8)
+            .into(),
+        ]
+    }
+
+    /// The reading controls and Next sit at the right. Play shows on any
+    /// chapter page; the rest only while something is being read.
+    fn header_end(&self) -> Vec<Element<'_, Self::Message>> {
+        let Some(lib) = &self.library else {
+            return Vec::new();
+        };
+        let on_chapter = match self.shelf[self.at.slot] {
+            Slot::Book(i) => !lib.bible.books[i].chapters.is_empty(),
+            Slot::Title => false,
+        };
+        let mut controls = row![].spacing(2);
+        if let Some(reading) = &self.reading {
+            let play_icon = if reading.paused { "media-playback-start-symbolic" } else { "media-playback-pause-symbolic" };
+            controls = controls
+                .push(button::icon(icon::from_name("media-skip-backward-symbolic")).on_press(Message::PreviousVerse))
+                .push(button::icon(icon::from_name(play_icon)).on_press(Message::PlayPause))
+                .push(button::icon(icon::from_name("media-skip-forward-symbolic")).on_press(Message::NextVerse))
+                .push(button::icon(icon::from_name("media-playback-stop-symbolic")).on_press(Message::StopReading));
+        } else if on_chapter {
+            controls = controls.push(button::icon(icon::from_name("media-playback-start-symbolic")).on_press(Message::PlayPause));
+        }
+        vec![
+            row![controls, button::standard("Next ›").on_press(Message::NextPage)]
+                .spacing(8)
+                .align_y(iced::Alignment::Center)
+                .into(),
+        ]
+    }
+
+    /// The right-hand drawer carries the trail, and nothing else.
+    fn context_drawer(&self) -> Option<ContextDrawer<'_, Self::Message>> {
+        if !self.core.window.show_context {
+            return None;
+        }
+        let title = self.trail.last().map(|s| self.stop_label(s)).unwrap_or_default();
+        Some(context_drawer::context_drawer(self.trail_panel(), Message::ClosePanel).title(title))
+    }
+
+    fn view(&self) -> Element<'_, Self::Message> {
+        let Some(lib) = &self.library else {
+            let notice = match &self.error {
+                Some(error) => format!("Couldn't open the text: {error}"),
+                None => "Opening the World English Bible…".to_string(),
+            };
+            return container(text(notice).size(18))
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .center_x(Length::Fill)
+                .center_y(Length::Fill)
+                .into();
+        };
+
+        let palette = Palette::current();
+        let page: Element<'_, Message> = match self.shelf[self.at.slot] {
+            Slot::Title => {
+                let title = title_page(&palette);
+                return if self.contents_open {
+                    row![self.contents(), divider::vertical::light(), title]
+                        .width(Length::Fill)
+                        .height(Length::Fill)
+                        .into()
+                } else {
+                    title
+                };
+            }
+            Slot::Book(i) => book_page(&lib.bible.books[i], i as u8, self.at.page, self.spoken_on_page(), &palette),
+        };
+
+        // The measure cap plus centering is what turns a window into a page:
+        // widen the window and the margins grow, not the line length.
+        let sheet = container(page).max_width(MEASURE).padding([24, 32]);
+        let mut page_area = column![].width(Length::Fill).height(Length::Fill);
+        if let Some(notice) = &self.voice_notice {
+            // A word about the voice, above the page, only while there is
+            // something to say.
+            page_area = page_area.push(
+                container(text(notice.as_str()).size(13).class(palette.muted))
+                    .width(Length::Fill)
+                    .center_x(Length::Fill)
+                    .padding([6, 0, 0, 0]),
+            );
+        }
+        let page_area = page_area.push(
+            container(scrollable(sheet).id(page_scroll_id()))
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .center_x(Length::Fill),
+        );
+
+        if self.contents_open {
+            row![self.contents(), divider::vertical::light(), page_area]
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .into()
+        } else {
+            page_area.into()
+        }
+    }
+}
+
+impl Sojourner {
+    fn handle(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::Loaded(Ok(library)) => {
                 self.shelf = shelf_order(&library);
-                self.at = Position { slot: 0, page: 0 };
                 self.library = Some(library);
+                // Open where the reader left off, if that place still exists.
+                self.at = self.saved_position().unwrap_or(Position { slot: 0, page: 0 });
+                if self.at.slot != 0 {
+                    self.expanded = Some(self.at.slot);
+                }
                 Task::none()
             }
             Message::Loaded(Err(error)) => {
@@ -661,154 +887,6 @@ impl Application for Sojourner {
                 reader::Event::Finished => self.continue_reading(),
                 reader::Event::Stopped => Task::none(),
             },
-        }
-    }
-
-    /// Left/Right (and PageUp/PageDown) turn pages; Up/Down scroll the one
-    /// you're on; Space plays or pauses; Shift+Up/Down go back a verse or
-    /// skip one. Only key presses no widget claimed are considered, so
-    /// typing in a search box later won't turn pages. The second
-    /// subscription is the voice thread, which lives as long as the window.
-    fn subscription(&self) -> Subscription<Self::Message> {
-        let keys = iced::event::listen_with(|event, status, _window| {
-            if status != iced::event::Status::Ignored {
-                return None;
-            }
-            let Event::Keyboard(keyboard::Event::KeyPressed { key, modifiers, .. }) = event else {
-                return None;
-            };
-            match key {
-                // The space bar arrives as the character it types.
-                keyboard::Key::Character(c) if c == " " => Some(Message::PlayPause),
-                keyboard::Key::Named(key) => match key {
-                    Named::ArrowRight | Named::PageDown => Some(Message::NextPage),
-                    Named::ArrowLeft | Named::PageUp => Some(Message::PreviousPage),
-                    Named::ArrowDown if modifiers.shift() => Some(Message::NextVerse),
-                    Named::ArrowUp if modifiers.shift() => Some(Message::PreviousVerse),
-                    Named::ArrowDown => Some(Message::ScrollPage(SCROLL_STEP)),
-                    Named::ArrowUp => Some(Message::ScrollPage(-SCROLL_STEP)),
-                    Named::Escape => Some(Message::ClosePanel),
-                    _ => None,
-                },
-                _ => None,
-            }
-        });
-        Subscription::batch([keys, Subscription::run(voice_thread)])
-    }
-
-    /// The Contents toggle and Previous sit at the left of the header bar,
-    /// Next at the right, with the title between them, so the page itself
-    /// stays nothing but text.
-    fn header_start(&self) -> Vec<Element<'_, Self::Message>> {
-        if self.library.is_none() {
-            return Vec::new();
-        }
-        vec![
-            row![
-                button::icon(icon::from_name("open-menu-symbolic")).on_press(Message::ToggleContents),
-                button::standard("‹ Previous").on_press(Message::PreviousPage),
-            ]
-            .spacing(8)
-            .into(),
-        ]
-    }
-
-    /// The reading controls and Next sit at the right. Play shows on any
-    /// chapter page; the rest only while something is being read.
-    fn header_end(&self) -> Vec<Element<'_, Self::Message>> {
-        let Some(lib) = &self.library else {
-            return Vec::new();
-        };
-        let on_chapter = match self.shelf[self.at.slot] {
-            Slot::Book(i) => !lib.bible.books[i].chapters.is_empty(),
-            Slot::Title => false,
-        };
-        let mut controls = row![].spacing(2);
-        if let Some(reading) = &self.reading {
-            let play_icon = if reading.paused { "media-playback-start-symbolic" } else { "media-playback-pause-symbolic" };
-            controls = controls
-                .push(button::icon(icon::from_name("media-skip-backward-symbolic")).on_press(Message::PreviousVerse))
-                .push(button::icon(icon::from_name(play_icon)).on_press(Message::PlayPause))
-                .push(button::icon(icon::from_name("media-skip-forward-symbolic")).on_press(Message::NextVerse))
-                .push(button::icon(icon::from_name("media-playback-stop-symbolic")).on_press(Message::StopReading));
-        } else if on_chapter {
-            controls = controls.push(button::icon(icon::from_name("media-playback-start-symbolic")).on_press(Message::PlayPause));
-        }
-        vec![
-            row![controls, button::standard("Next ›").on_press(Message::NextPage)]
-                .spacing(8)
-                .align_y(iced::Alignment::Center)
-                .into(),
-        ]
-    }
-
-    /// The right-hand drawer carries the trail, and nothing else.
-    fn context_drawer(&self) -> Option<ContextDrawer<'_, Self::Message>> {
-        if !self.core.window.show_context {
-            return None;
-        }
-        let title = self.trail.last().map(|s| self.stop_label(s)).unwrap_or_default();
-        Some(context_drawer::context_drawer(self.trail_panel(), Message::ClosePanel).title(title))
-    }
-
-    fn view(&self) -> Element<'_, Self::Message> {
-        let Some(lib) = &self.library else {
-            let notice = match &self.error {
-                Some(error) => format!("Couldn't open the text: {error}"),
-                None => "Opening the World English Bible…".to_string(),
-            };
-            return container(text(notice).size(18))
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .center_x(Length::Fill)
-                .center_y(Length::Fill)
-                .into();
-        };
-
-        let palette = Palette::current();
-        let page: Element<'_, Message> = match self.shelf[self.at.slot] {
-            Slot::Title => {
-                let title = title_page(&palette);
-                return if self.contents_open {
-                    row![self.contents(), divider::vertical::light(), title]
-                        .width(Length::Fill)
-                        .height(Length::Fill)
-                        .into()
-                } else {
-                    title
-                };
-            }
-            Slot::Book(i) => book_page(&lib.bible.books[i], i as u8, self.at.page, self.spoken_on_page(), &palette),
-        };
-
-        // The measure cap plus centering is what turns a window into a page:
-        // widen the window and the margins grow, not the line length.
-        let sheet = container(page).max_width(MEASURE).padding([24, 32]);
-        let mut page_area = column![].width(Length::Fill).height(Length::Fill);
-        if let Some(notice) = &self.voice_notice {
-            // A word about the voice, above the page, only while there is
-            // something to say.
-            page_area = page_area.push(
-                container(text(notice.as_str()).size(13).class(palette.muted))
-                    .width(Length::Fill)
-                    .center_x(Length::Fill)
-                    .padding([6, 0, 0, 0]),
-            );
-        }
-        let page_area = page_area.push(
-            container(scrollable(sheet).id(page_scroll_id()))
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .center_x(Length::Fill),
-        );
-
-        if self.contents_open {
-            row![self.contents(), divider::vertical::light(), page_area]
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .into()
-        } else {
-            page_area.into()
         }
     }
 }

@@ -1,9 +1,3 @@
-/target
-assets/web-source/
-assets/web-usfm/
-assets/web-html/
-# The voice model (114 MB) and ONNX Runtime are obtained separately;
-# assets/SOURCES.md has the URLs and hashes. The voice card and config
-# beside the model are committed.
-assets/voices/*.onnx
-assets/onnxruntime/
+# SIL's Gentium release zip, obtained by the author; the three font files
+# and the license out of it are committed under assets/fonts/.
+assets/fonts-source/

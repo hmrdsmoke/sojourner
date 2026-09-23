@@ -27,6 +27,11 @@ serde_json = "1"
 # The place the reader left off, saved through cosmic-config (as RON).
 serde = { version = "1", features = ["derive"] }
 
+[dev-dependencies]
+# tests/pages.rs checks the bundled book face against the hashes recorded
+# in assets/SOURCES.md. Already in the tree through libcosmic.
+sha2 = "0.11"
+
 [dependencies.libcosmic]
 git = "https://github.com/pop-os/libcosmic.git"
 default-features = false

@@ -3,18 +3,19 @@
 //! The pages: proof that dealing a chapter onto sheets loses nothing,
 //! doubles nothing, and fills no sheet past its bottom.
 //!
-//! Typesetting measures text with the real paragraph engine and the fonts
-//! on this machine, so the number of sheets a chapter takes can differ
-//! from one machine to the next; the invariants cannot. Every chapter is
-//! checked by `every_chapter_deals_onto_sheets_whole`, which takes about
-//! two minutes in a debug build and so is ignored by default; `cargo test`
-//! runs `a_sample_of_chapters_deals_onto_sheets_whole` over every seventh
-//! chapter and the ones most likely to break. Run the whole thing with
-//! `cargo test --test pages -- --ignored`.
+//! Typesetting measures text with the real paragraph engine and the book
+//! face compiled into the binary, so every machine sets the same sheets
+//! and the counts here are exact, like every other count in these tests.
+//! Every chapter is checked by `every_chapter_deals_onto_sheets_whole`,
+//! which takes a few minutes in a debug build and so is ignored by
+//! default; `cargo test` runs `a_sample_of_chapters_deals_onto_sheets_whole`
+//! over every seventh chapter and the ones most likely to break. Run the
+//! whole thing with `cargo test --test pages -- --ignored`.
 
 use std::time::Instant;
 
-use sojourner::page::{self, geometry, is_air, paginate, typeset_chapter, Leaf, PageLink, Par, DEFAULT_TEXT_SIZE, TEXT_HEIGHT};
+use sha2::{Digest, Sha256};
+use sojourner::page::{self, geometry, is_air, paginate, typeset_chapter, Leaf, PageLink, Par, BOOK_FACE_FILES, DEFAULT_TEXT_SIZE, TEXT_HEIGHT};
 use sojourner::text::Book;
 use sojourner::Library;
 
@@ -154,11 +155,13 @@ fn a_sample_of_chapters_deals_onto_sheets_whole() {
         }
     }
     report("sample", &tally, started);
-    assert!(tally.chapters >= 200, "{} chapters is too small a sample", tally.chapters);
+    assert_eq!(tally.chapters, 216);
+    assert_eq!((tally.sheets, tally.splits), (725, 261), "the sample's sheets and splits at {DEFAULT_TEXT_SIZE} px");
+    assert_eq!(tally.longest, (16, "Psalm 119".to_string()));
 }
 
 #[test]
-#[ignore = "two minutes in a debug build: cargo test --test pages -- --ignored"]
+#[ignore = "a few minutes in a debug build: cargo test --test pages -- --ignored"]
 fn every_chapter_deals_onto_sheets_whole() {
     let lib = Library::load_bundled().expect("the bundled text");
     let started = Instant::now();
@@ -170,9 +173,8 @@ fn every_chapter_deals_onto_sheets_whole() {
     }
     report("everything", &tally, started);
     assert_eq!(tally.chapters, 1_402 + 2, "every chapter, the preface and the glossary");
-    // Font-dependent, so only roughly: a Bible of this size at this text
-    // size runs to a few thousand sheets.
-    assert!((2_000..=6_000).contains(&tally.sheets), "{} sheets", tally.sheets);
+    assert_eq!((tally.sheets, tally.splits), (4_668, 1_743), "the whole book's sheets and splits at {DEFAULT_TEXT_SIZE} px");
+    assert_eq!(tally.longest, (16, "Psalm 119".to_string()));
 }
 
 #[test]
@@ -186,9 +188,8 @@ fn a_larger_text_takes_more_sheets() {
     }
     let at = |body: f32| paginate(typeset_chapter(book, genesis as u8, 0), body).len();
     let (small, normal, large) = (at(14.0), at(DEFAULT_TEXT_SIZE), at(26.0));
-    eprintln!("Genesis 1: {small} sheets at 14 px, {normal} at 18 px, {large} at 26 px");
-    assert!(small <= normal && normal < large);
-    assert!((2..=5).contains(&normal), "Genesis 1 at 18 px: {normal} sheets");
+    eprintln!("Genesis 1: {small} sheets at 14 px, {normal} at {DEFAULT_TEXT_SIZE} px, {large} at 26 px");
+    assert_eq!((small, normal, large), (2, 3, 5));
 }
 
 #[test]
@@ -214,4 +215,20 @@ fn the_pieces_carry_their_verses_and_links() {
     assert_eq!(pieces[two].text, "2\u{A0}");
     let one = pieces.iter().position(|p| matches!(p.link, Some(PageLink::Verse(v)) if v.verse == 1)).unwrap();
     assert_eq!(pieces[one - 1].text, "\u{2003}", "the paragraph's first-line indent");
+}
+
+/// The book face compiled in is SIL's release of it, file for file: the
+/// hashes recorded in assets/SOURCES.md, section 6.
+#[test]
+fn the_book_face_is_the_release_it_says() {
+    let recorded = [
+        ("GentiumBookPlus-Regular.ttf", "298d3e2d2cdf0460d27151de50e2a5764d4de4921f5a6fc254ed5aeda6890f1e"),
+        ("GentiumBookPlus-Italic.ttf", "ab3d2755ad7e43ca680d4b527cc126a0099fb19d659464b5ea6e1f8b537828ad"),
+        ("GentiumBookPlus-Bold.ttf", "bad0c69e4452a2c34d66754ad56a0f0c12b043cb40c44216337439eeae500831"),
+    ];
+    for ((name, bytes), (recorded_name, hash)) in BOOK_FACE_FILES.iter().zip(recorded) {
+        assert_eq!(*name, recorded_name);
+        let digest: String = Sha256::digest(bytes).iter().map(|b| format!("{b:02x}")).collect();
+        assert_eq!(digest, hash, "{name} is not the file SOURCES.md records");
+    }
 }

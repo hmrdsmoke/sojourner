@@ -28,16 +28,19 @@ It is being built in the open and is not finished. What works today:
   names generated from two sourced pronouncing dictionaries (the CMU
   Pronouncing Dictionary and Chambers's 1908 "Pronouncing Vocabulary of
   Scripture Proper Names"), so "Job" is the man, not the work.
-- Pages: each chapter is typeset onto sheets of one size, justified, with a
-  running head and a page number, and split between lines the way a printer
-  would (no single line left behind, no heading at the foot of a page); the
-  text is measured by the same engine that draws it, and `cargo test` proves
-  that no sheet overflows and nothing is lost or doubled in the dealing.
-  Ctrl+plus and Ctrl+minus change the text size; the sheets are set afresh.
+- Pages: each chapter is typeset onto sheets of one size in Gentium Book
+  Plus (SIL's face for scripture, Open Font License, compiled in — the
+  publisher sets its own edition in Gentium), justified, with a running head
+  and a page number, and split between lines the way a printer would (no
+  single line left behind, no heading at the foot of a page). The text is
+  measured by the same engine that draws it, so every machine sets the same
+  sheets, and `cargo test` pins the count: 4,668 sheets at the default size,
+  none overflowing, nothing lost or doubled in the dealing. Ctrl+plus and
+  Ctrl+minus change the text size; the sheets are set afresh.
 - A Contents sidebar, the trail panel; it opens where you left off.
 
-Not yet: a Flatpak, settings beyond the text size, a bundled book face, and
-the 2,900 rarer names neither dictionary has.
+Not yet: a Flatpak, settings beyond the text size, and the 2,900 rarer names
+neither dictionary has.
 
 ## Where the words come from
 
@@ -51,7 +54,8 @@ that is written down too.
 
 Sojourner's own code is GPL-3.0 (see [`LICENSE`](LICENSE)). The text is
 public domain, the cross-references CC BY 4.0, the voice's dataset public
-domain — those licenses belong to the data and are recorded with it.
+domain, the typeface under the SIL Open Font License — those licenses belong
+to the data and are recorded with it.
 
 ## Building
 

@@ -18,9 +18,11 @@
 //! sheet, and `tests/pages.rs` proves that nothing is lost or doubled in
 //! the dealing and that every sheet fits.
 
+use std::borrow::Cow;
 use std::collections::VecDeque;
+use std::sync::Once;
 
-use cosmic::iced::advanced::graphics::text::Paragraph as Typeset;
+use cosmic::iced::advanced::graphics::text::{font_system, Paragraph as Typeset};
 use cosmic::iced::advanced::text::{Alignment, Ellipsize, Paragraph as _, Shaping, Text as TextSpec, Wrapping};
 use cosmic::iced::core::text::LineHeight;
 use cosmic::iced::widget::text::{IntoFragment, Span};
@@ -33,23 +35,60 @@ use crate::text::{Block, BlockKind, Book, Inline, TextStyle, VerseRef};
 // The sheet
 // ────────────────────────────────────────────────────────────────────────────
 
-/// A serif face for the page. `Family::Serif` asks the system for its
-/// default serif; on Pop!_OS that is usually DejaVu Serif or Noto Serif. A
-/// bundled book face can replace this later without touching the layout.
+/// The book face: Gentium Plus, SIL International's serif for scripture
+/// and linguistics, the face the publisher sets its own HTML edition in.
+/// Compiled in and loaded into the text engine before anything is
+/// measured, so every machine sets the same pages — which is what lets
+/// `tests/pages.rs` pin sheet counts. Where it comes from and under what
+/// terms (the SIL Open Font License) is in assets/SOURCES.md, section 6.
+pub const BOOK_FACE: &str = "Gentium Book Plus";
+
+/// The weights the face's files carry. The text engine matches a family's
+/// weight exactly (a request for 400 finds nothing in a family whose
+/// regular is 500 and falls through to another face), so these are the
+/// files' own numbers, not "normal" and "bold".
+const BOOK_WEIGHT: iced::font::Weight = iced::font::Weight::Medium;
+const BOOK_BOLD: iced::font::Weight = iced::font::Weight::ExtraBold;
+
+/// The face's files — regular, italic and bold — unchanged from SIL's
+/// release, with their names, so a test can hold them to the hashes in
+/// assets/SOURCES.md.
+pub const BOOK_FACE_FILES: [(&str, &[u8]); 3] = [
+    ("GentiumBookPlus-Regular.ttf", include_bytes!("../assets/fonts/GentiumBookPlus-Regular.ttf")),
+    ("GentiumBookPlus-Italic.ttf", include_bytes!("../assets/fonts/GentiumBookPlus-Italic.ttf")),
+    ("GentiumBookPlus-Bold.ttf", include_bytes!("../assets/fonts/GentiumBookPlus-Bold.ttf")),
+];
+
+/// Load the book face into the text engine's font system — the one global
+/// the renderer draws with, so what is measured here is drawn with the same
+/// face. Done once; every path that measures calls it first, and the window
+/// calls it before it opens.
+pub fn load_book_face() {
+    static ONCE: Once = Once::new();
+    ONCE.call_once(|| {
+        let mut fonts = font_system().write().expect("the font system");
+        for (_, file) in BOOK_FACE_FILES {
+            fonts.load_font(Cow::Borrowed(file));
+        }
+    });
+}
+
 pub const SERIF: Font = Font {
-    family: iced::font::Family::Serif,
+    family: iced::font::Family::Name(BOOK_FACE),
+    weight: BOOK_WEIGHT,
     ..Font::DEFAULT
 };
 
 pub const SERIF_ITALIC: Font = Font {
-    family: iced::font::Family::Serif,
+    family: iced::font::Family::Name(BOOK_FACE),
+    weight: BOOK_WEIGHT,
     style: iced::font::Style::Italic,
     ..Font::DEFAULT
 };
 
 pub const SERIF_BOLD: Font = Font {
-    family: iced::font::Family::Serif,
-    weight: iced::font::Weight::Bold,
+    family: iced::font::Family::Name(BOOK_FACE),
+    weight: BOOK_BOLD,
     ..Font::DEFAULT
 };
 
@@ -64,16 +103,20 @@ pub const MARGIN_X: f32 = 44.0;
 pub const MARGIN_Y: f32 = 52.0;
 
 /// The text area of the sheet: 552 × 756, which at the default size is
-/// exactly 28 lines of body text.
+/// 25 lines of body text.
 pub const TEXT_WIDTH: f32 = SHEET_WIDTH - 2.0 * MARGIN_X;
 pub const TEXT_HEIGHT: f32 = SHEET_HEIGHT - 2.0 * MARGIN_Y;
 
 /// Body text size to start with; the reader can change it within the
 /// range. Every other size on the page is a share of it, and the air
-/// between paragraphs scales with it too.
-pub const DEFAULT_TEXT_SIZE: f32 = 18.0;
-pub const SMALLEST_TEXT: f32 = 14.0;
-pub const LARGEST_TEXT: f32 = 26.0;
+/// between paragraphs scales with it too. (Gentium has a small x-height;
+/// 20 px of it reads like 18 px of the common screen serifs.)
+pub const DEFAULT_TEXT_SIZE: f32 = 20.0;
+pub const SMALLEST_TEXT: f32 = 15.0;
+pub const LARGEST_TEXT: f32 = 28.0;
+
+/// The size the air and indents were drawn for; they scale from it.
+const DESIGN_SIZE: f32 = 18.0;
 
 /// Small capitals ("LORD"): the letters after the first, as a share of the
 /// body size.
@@ -204,7 +247,7 @@ pub struct Geometry {
 
 pub fn geometry(shape: Shape, body: f32) -> Geometry {
     // Air and indents were drawn for 18 px text and scale with it.
-    let u = body / DEFAULT_TEXT_SIZE;
+    let u = body / DESIGN_SIZE;
     let line = body * 1.5;
     let g = |font, size, line, align, indent, above, below| Geometry { font, size, line, align, indent, above, below };
     match shape {
@@ -552,6 +595,7 @@ pub fn shaped_span<'a>(text: impl IntoFragment<'a>, piece: &Piece, g: &Geometry)
 /// and the byte offset, into the pieces' text run together, where it
 /// starts. Measured by the renderer's own paragraph engine.
 pub fn lines_of(par: &Par, g: &Geometry) -> Vec<(f32, usize)> {
+    load_book_face();
     let spans: Vec<Span<'_, PageLink, Font>> = par.pieces.iter().map(|p| shaped_span(p.text.as_str(), p, g)).collect();
     let set = Typeset::with_spans(TextSpec {
         content: spans.as_slice(),

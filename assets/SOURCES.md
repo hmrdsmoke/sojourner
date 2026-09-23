@@ -43,7 +43,7 @@ them.
   translation of God’s Proper Name (Hebrew “יהוה”, usually pronounced
   Yahweh)"). On the page the capitals are set as small capitals — the first
   letter at body size, the rest smaller — which is only typography; the
-  letters are the publisher's.
+  letters are the publisher's. The face the page is set in is section 6.
 - Shelves the Deuterocanon after the New Testament, as a labeled section.
   The publisher's file order places these books between the testaments;
   Sojourner reorders for display only. The books themselves are unchanged.
@@ -449,3 +449,45 @@ or the author's ear on the frequent ones, is the next step.
   which only `espeak_Synth` does; Sojourner sets it once after initializing
   (`src/voice/phonemes.rs`). An internal of espeak-ng 1.52 as bundled by
   espeak-rs-sys 0.2.0; the tests above will notice if an update changes it.
+
+---
+
+## 6. Typeface — Gentium Book Plus
+
+| | |
+|---|---|
+| Work | Gentium Plus, version 6.200 (1 February 2023): the "Gentium Book Plus" family — the same design at a slightly heavier weight, which the designers offer for smaller sizes and screens. Regular, Italic and Bold are used |
+| Designer / publisher | SIL International; Gentium was designed by Victor Gaultney and is developed by SIL's Writing Systems Technology team (the FONTLOG's "SIL WSTech Team"). https://software.sil.org/gentium/ |
+| File obtained | https://software.sil.org/downloads/r/gentium/GentiumPlus-6.200.zip (10,935,378 bytes) |
+| Obtained | 2026-09-23, by the author, directly from the publisher |
+| SHA-256 of the zip | `9b21103b79961149b6508791572acb3b2fe7eb621474c57d5e4ee37e76d7b073` |
+| Files kept, unchanged, in `assets/fonts/` | `GentiumBookPlus-Regular.ttf` `298d3e2d2cdf0460d27151de50e2a5764d4de4921f5a6fc254ed5aeda6890f1e` (875,136 bytes); `GentiumBookPlus-Italic.ttf` `ab3d2755ad7e43ca680d4b527cc126a0099fb19d659464b5ea6e1f8b537828ad` (951,280 bytes); `GentiumBookPlus-Bold.ttf` `bad0c69e4452a2c34d66754ad56a0f0c12b043cb40c44216337439eeae500831` (891,340 bytes); the publisher's `OFL.txt` (`d8d18e5a…cf63`) and `FONTLOG.txt` (`11aacc79…390f`) from the same zip |
+| Format | TrueType, with OpenType and Graphite smart-font tables; the files declare version 6.200 and weights 500 (Regular, Italic) and 800 (Bold) |
+| License | SIL Open Font License, version 1.1, with Reserved Font Names "Gentium" and "SIL". Copyright (c) 2003–2023 SIL International. The OFL allows the fonts to be bundled with and redistributed in software as long as they are not sold by themselves and no modified version uses the reserved names; Sojourner bundles them unmodified, under their own names. The OFL is the fonts' license, not Sojourner's; the GPL does not apply to them |
+| Why this face | The publisher of the text sets its own HTML edition in Gentium (the USFM and HTML zips carry `gentiumplus.css`), the face was made for scripture and linguistics, and it is open. The Book weight was chosen over the regular by looking at both on screen at the page's size |
+
+### What Sojourner does with it
+
+- Compiles the three files into the binary and loads them into the text
+  engine at startup (`src/page.rs`, `load_book_face`), before anything is
+  measured or drawn. Every page is measured and drawn in this face and no
+  other, so the book sets the same on every machine: the same lines, the
+  same sheets, the same page numbers.
+- Uses the face as it is. There is no small-capitals feature call (the
+  engine offers none); "LORD" is set as a large capital followed by
+  smaller capitals, as section 1 says.
+- Does not use Gentium's bold italic, or the lighter Gentium Plus family
+  in the same release.
+
+### Verification
+
+- 2026-09-23: the three files were taken from the release zip above and
+  compared byte for byte with Debian's packaging of the same release
+  (`fonts-sil-gentiumplus` 6.200-1, which repackages the publisher's
+  zip): identical.
+- `cargo test` (`tests/pages.rs`) hashes the three files compiled into the
+  binary and holds them to the hashes above, and — because the face is
+  fixed — pins the typesetting itself: at the default 20 px, the whole
+  text is 4,668 sheets with 1,743 paragraphs split, Psalm 119 the longest
+  at 16; Genesis 1 is 2, 3 and 5 sheets at 14, 20 and 26 px. Any change
+  to the face, the engine or the rules shows up as a changed count.

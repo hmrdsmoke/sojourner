@@ -3,7 +3,7 @@
 A Bible for the COSMIC desktop that reads to you.
 
 Sojourner opens the World English Bible (the publisher's Updated edition)
-like a book — a title page, the publisher's preface, every book from Genesis
+like a book — a cover, the publisher's preface, every book from Genesis
 to the glossary, with the Deuterocanon shelved after the New Testament, on
 pages of a fixed size that turn rather than scroll — and reads it aloud,
 verse by verse, with a voice that runs entirely on your machine. Verse numbers and note markers are links: click one and a panel

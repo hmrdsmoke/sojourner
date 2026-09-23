@@ -6,7 +6,7 @@
 //! `sojourner::crossrefs`); this file only decides what the reader is
 //! looking at and draws it.
 //!
-//! The book opens on a title page. Turning the page goes through the
+//! The book opens on its cover. Turning the page goes through the
 //! publisher's own preface, then the Old Testament, the New Testament, the
 //! Deuterocanon, and finally the publisher's glossary — every file in the
 //! zip, in Sojourner's shelf order. Pages turn with the arrows beside the
@@ -53,7 +53,7 @@ use cosmic::iced::futures::Stream;
 use cosmic::iced::widget::scrollable::{scroll_by, scroll_to, AbsoluteOffset, Direction, Scrollbar};
 use cosmic::iced::widget::text::{Rich, Span};
 use cosmic::iced::widget::{mouse_area, rich_text, span, stack, Id};
-use cosmic::iced::{self, window, Border, Color, Event, Font, Length, Pixels, Shadow, Size, Subscription, Vector};
+use cosmic::iced::{self, gradient, window, Background, Border, Color, Event, Font, Length, Pixels, Radians, Shadow, Size, Subscription, Vector};
 use cosmic::widget::{button, column, container, divider, flex_row, icon, responsive, row, scrollable, space, text};
 use cosmic::{Application, ApplicationExt, Element};
 use serde::{Deserialize, Serialize};
@@ -138,7 +138,7 @@ pub struct Sojourner {
 /// Where the reader left off, as it is saved: the publisher's book code
 /// ("JHN"), the chapter number and the first verse that begins on the
 /// sheet (so the book reopens on that very sheet), or an empty code for
-/// the title page. Codes and numbers rather than positions,
+/// the cover. Codes and numbers rather than positions,
 /// so the place survives a change of edition, shelf order or text size.
 /// (Places saved before there were verses have none; that reads as 0, the
 /// start of the chapter.)
@@ -162,7 +162,7 @@ struct Reading {
     paused: bool,
 }
 
-/// One thing on the shelf: Sojourner's own title page, or one of the
+/// One thing on the shelf: the book's cover, or one of the
 /// publisher's files (a book of scripture, the preface, the glossary).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Slot {
@@ -173,7 +173,7 @@ enum Slot {
 
 /// A place on the shelf: which slot, which chapter of it, and which sheet
 /// of the chapter. For a book of scripture the page is the chapter
-/// (0-based); the title page, preface and glossary each have a single page.
+/// (0-based); the cover, preface and glossary each have a single page.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Position {
     slot: usize,
@@ -262,7 +262,7 @@ impl Sojourner {
         })
     }
 
-    /// How many sheets a chapter has (one for the title page).
+    /// How many sheets a chapter has (one for the cover).
     fn leaf_count(&mut self, slot: usize, page: usize) -> usize {
         match self.shelf[slot] {
             Slot::Title => 1,
@@ -490,7 +490,7 @@ impl Sojourner {
     }
 
     /// Save the place the page shows. Failures are not worth stopping for:
-    /// the book still opens, just at the title page next time.
+    /// the book still opens, just at the cover next time.
     fn remember_place(&self) {
         if let (Some(store), Some(place)) = (Self::place_store(), self.place()) {
             if let Err(e) = store.set("place", place) {
@@ -518,7 +518,7 @@ impl Sojourner {
     }
 
     /// What the header shows: the chapter on the page, or the app's name on
-    /// the title page.
+    /// the cover.
     fn heading(&self) -> String {
         let Some(lib) = &self.library else { return "Sojourner".to_string() };
         match self.shelf.get(self.at.slot) {
@@ -540,7 +540,7 @@ impl Sojourner {
     }
 }
 
-/// Sojourner's shelf order: the title page, the publisher's preface, the Old
+/// Sojourner's shelf order: the cover, the publisher's preface, the Old
 /// Testament, the New Testament, the Deuterocanon, the glossary. The
 /// publisher's file order (which `Bible::books` keeps) puts the Deuterocanon
 /// between the testaments; the reorder happens here, at view time, and
@@ -1069,20 +1069,14 @@ impl Sojourner {
     }
 
     /// One sheet of paper: the running head in the top margin, the text
-    /// area, the folio in the bottom margin. On the title page, just the
-    /// title.
+    /// area, the folio in the bottom margin. Or the cover.
     fn sheet(&self) -> Element<'_, Message> {
         let palette = Palette::current();
         let paper = paper_style(&palette);
         let Some(lib) = &self.library else { return space::horizontal().into() };
 
         let Slot::Book(i) = self.shelf[self.at.slot] else {
-            return container(title_page(&palette))
-                .width(SHEET_WIDTH)
-                .height(SHEET_HEIGHT)
-                .padding([MARGIN_Y, MARGIN_X])
-                .class(paper)
-                .into();
+            return cover(&palette);
         };
         let book = &lib.bible.books[i];
         let leaves = self.leaves.get(&(self.at.slot, self.at.page));
@@ -1184,32 +1178,78 @@ fn paper_style(palette: &Palette) -> cosmic::theme::Container<'static> {
     })
 }
 
-/// Sojourner's own first page. Everything on it is either the app's name or
-/// a fact recorded in assets/SOURCES.md.
-fn title_page<'a>(palette: &Palette) -> Element<'a, Message> {
-    let sheet = column![
-        text("Sojourner").size(46).font(SERIF),
+/// The cover: the board the book opens from, the sheet's size, in place of
+/// a title page. Oxblood cloth, the title stamped in gold inside a double
+/// rule, the app's name at the foot like an imprint; the same by day and by
+/// night, since a cover is a cover. Everything on it is either the app's
+/// name or a fact recorded in assets/SOURCES.md.
+fn cover<'a>(palette: &Palette) -> Element<'a, Message> {
+    let gold = palette.gold;
+    let quiet = Color { a: 0.8, ..gold };
+    let rule = |width: f32| container(space::horizontal()).width(width).height(1.5).class(fill_style(gold));
+
+    let stamped = column![
+        space::vertical().height(Length::FillPortion(5)),
+        text("THE HOLY BIBLE").size(40).font(SERIF).class(gold),
+        space::vertical().height(20),
+        rule(150.0),
+        space::vertical().height(22),
+        text("World English Bible").size(24).font(SERIF_ITALIC).class(gold),
+        space::vertical().height(8),
+        text("Updated edition").size(15).font(SERIF).class(quiet),
+        space::vertical().height(Length::FillPortion(6)),
+        text("Sojourner").size(15).font(SERIF).class(quiet),
         space::vertical().height(10),
-        container(divider::horizontal::light()).width(160),
-        space::vertical().height(18),
-        text("The Holy Bible").size(26).font(SERIF),
-        space::vertical().height(6),
-        text("World English Bible").size(18).font(SERIF),
-        space::vertical().height(28),
-        text("Updated edition · Public domain · eBible.org").size(13).class(palette.page_muted),
-        text("Cross-references from openbible.info, CC BY 4.0").size(13).class(palette.page_muted),
-        space::vertical().height(40),
-        text("Turn the page with → or the arrow beside it").size(13).class(palette.page_muted),
     ]
     .align_x(iced::Alignment::Center)
-    .spacing(0);
+    .width(Length::Fill)
+    .height(Length::Fill);
 
-    container(sheet)
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .center_x(Length::Fill)
-        .center_y(Length::Fill)
+    // Two rules around the stamping, a hand's breadth in from the edge.
+    let inner = container(stamped).width(Length::Fill).height(Length::Fill).padding(24).class(frame_style(gold, 1.0, 0.45));
+    let outer = container(inner).width(Length::Fill).height(Length::Fill).padding(8).class(frame_style(gold, 1.5, 0.6));
+
+    container(outer)
+        .width(SHEET_WIDTH)
+        .height(SHEET_HEIGHT)
+        .padding([22.0, 22.0, 22.0, 30.0])
+        .class(board_style(palette))
         .into()
+}
+
+/// The cover's board: oxblood, darker along the spine, with the sheet's
+/// shadow.
+fn board_style(palette: &Palette) -> cosmic::theme::Container<'static> {
+    let (board, spine, shadow) = (palette.board, palette.spine, palette.shadow);
+    cosmic::theme::Container::custom(move |_theme| iced::widget::container::Style {
+        background: Some(Background::Gradient(
+            gradient::Linear::new(Radians(std::f32::consts::FRAC_PI_2))
+                .add_stop(0.0, spine)
+                .add_stop(0.035, board)
+                .add_stop(1.0, board)
+                .into(),
+        )),
+        border: Border { color: Color::TRANSPARENT, width: 0.0, radius: 3.0.into() },
+        shadow: Shadow { color: shadow, offset: Vector::new(0.0, 3.0), blur_radius: 16.0 },
+        ..Default::default()
+    })
+}
+
+/// A rule around something: a border in the given colour and weight, at
+/// the given strength, and nothing else.
+fn frame_style(color: Color, width: f32, alpha: f32) -> cosmic::theme::Container<'static> {
+    cosmic::theme::Container::custom(move |_theme| iced::widget::container::Style {
+        border: Border { color: Color { a: alpha, ..color }, width, radius: 2.0.into() },
+        ..Default::default()
+    })
+}
+
+/// A plain fill in one colour, for rules.
+fn fill_style(color: Color) -> cosmic::theme::Container<'static> {
+    cosmic::theme::Container::custom(move |_theme| iced::widget::container::Style {
+        background: Some(Background::Color(color)),
+        ..Default::default()
+    })
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -1285,7 +1325,7 @@ impl Sojourner {
             match *slot {
                 Slot::Title => {
                     list = list.push(
-                        button::text(if here { "▸ Title page" } else { "Title page" })
+                        button::text(if here { "▸ Cover" } else { "Cover" })
                             .on_press(Message::GoTo(Position { slot: slot_ix, page: 0, leaf: 0 })),
                     );
                 }
@@ -1571,6 +1611,10 @@ struct Palette {
     page_muted: Color,
     /// The sheet's shadow on the desk.
     shadow: Color,
+    /// The cover: its cloth, the darker spine, the gold it is stamped in.
+    board: Color,
+    spine: Color,
+    gold: Color,
     /// Words of Jesus.
     red_letter: Color,
     /// Behind the verse being read aloud: the accent, faint.
@@ -1612,6 +1656,9 @@ impl Palette {
             ink,
             page_muted: Color { a: 0.6, ..ink },
             shadow,
+            board: Color::from_rgb8(0x4A, 0x1C, 0x22),
+            spine: Color::from_rgb8(0x33, 0x12, 0x17),
+            gold: Color::from_rgb8(0xD6, 0xB7, 0x6E),
             red_letter,
             spoken: Color { a: 0.22, ..accent },
         }

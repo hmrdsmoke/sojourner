@@ -2,31 +2,37 @@
 
 A Bible for the COSMIC desktop that reads to you.
 
-Sojourner opens the World English Bible like a book — a title page, the
-publisher's preface, every book from Genesis to the glossary, with the
-Deuterocanon shelved after the New Testament — and reads it aloud, verse by
-verse, with a voice that runs entirely on your machine. Verse numbers and note
-markers are links: click one and a panel opens on that verse and its
-cross-references, and you can follow a reference to the next verse and the
-next, with breadcrumbs back to where you started, while the page you were on
-stays put.
+Sojourner opens the World English Bible (the publisher's Updated edition)
+like a book — a title page, the publisher's preface, every book from Genesis
+to the glossary, with the Deuterocanon shelved after the New Testament — and
+reads it aloud, verse by verse, with a voice that runs entirely on your
+machine. Verse numbers and note markers are links: click one and a panel
+opens on that verse and its cross-references, and you can follow a reference
+to the next verse and the next, with breadcrumbs back to where you started,
+while the page you were on stays put.
 
 It is being built in the open and is not finished. What works today:
 
 - The whole text, every word the publisher shipped: 83 files, 38,058 verses,
-  1,855 footnotes, the translators' own cross-references, the Deuterocanon,
+  1,956 footnotes, the translators' own cross-references, the Deuterocanon,
   the glossary. Proven word for word against the publisher's own rendering
-  (`cargo test`).
+  (`cargo test`). The divine name is set as the publisher sets it, "LORD"
+  and "GOD" in small capitals.
 - 344,799 cross-references from openbible.info, every one resolved against
   the text.
 - Reading aloud with a local neural voice (Piper's LJ Speech voice):
   Play/Space reads the chapter, the verse being spoken is highlighted and
   kept in view, Shift+Up/Down go back a verse or skip one, and a chapter
   that ends runs on into the next.
-- Keyboard page turning, a Contents sidebar, the trail panel.
+- The names of scripture said as the dictionaries say them: a table of 682
+  names generated from two sourced pronouncing dictionaries (the CMU
+  Pronouncing Dictionary and Chambers's 1908 "Pronouncing Vocabulary of
+  Scripture Proper Names"), so "Job" is the man, not the work.
+- Keyboard page turning, a Contents sidebar, the trail panel; it opens where
+  you left off.
 
-Not yet: true fixed-size page flipping, a pronunciation table for the names
-of scripture (espeak-ng reads "Job" as the word *job*), a Flatpak, settings.
+Not yet: true fixed-size page flipping and the look of a book, a Flatpak,
+settings, and the 2,900 rarer names neither dictionary has.
 
 ## Where the words come from
 

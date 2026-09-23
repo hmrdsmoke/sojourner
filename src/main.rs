@@ -458,7 +458,7 @@ impl Application for Sojourner {
     type Flags = ();
     type Message = Message;
 
-    const APP_ID: &'static str = "io.github.smokethehmrd.Sojourner";
+    const APP_ID: &'static str = "io.github.hmrdsmoke.Sojourner";
 
     fn core(&self) -> &Core {
         &self.core

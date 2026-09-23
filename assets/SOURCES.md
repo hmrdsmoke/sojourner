@@ -476,6 +476,11 @@ or the author's ear on the frequent ones, is the next step.
 - Uses the face as it is. There is no small-capitals feature call (the
   engine offers none); "LORD" is set as a large capital followed by
   smaller capitals, as section 1 says.
+- Sets everything on the page in it — the words, the verse numbers, the
+  note markers — and nothing in the system's fonts, whose widths differ
+  from machine to machine and would break the same chapter into different
+  lines on different computers. (Hebrew, which Gentium lacks, occurs only
+  in footnotes, which are shown in the panel, not on the page.)
 - Does not use Gentium's bold italic, or the lighter Gentium Plus family
   in the same release.
 
@@ -488,6 +493,6 @@ or the author's ear on the frequent ones, is the next step.
 - `cargo test` (`tests/pages.rs`) hashes the three files compiled into the
   binary and holds them to the hashes above, and — because the face is
   fixed — pins the typesetting itself: at the default 20 px, the whole
-  text is 4,668 sheets with 1,743 paragraphs split, Psalm 119 the longest
+  text is 4,653 sheets with 1,725 paragraphs split, Psalm 119 the longest
   at 16; Genesis 1 is 2, 3 and 5 sheets at 14, 20 and 26 px. Any change
   to the face, the engine or the rules shows up as a changed count.

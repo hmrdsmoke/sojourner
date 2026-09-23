@@ -156,7 +156,7 @@ fn a_sample_of_chapters_deals_onto_sheets_whole() {
     }
     report("sample", &tally, started);
     assert_eq!(tally.chapters, 216);
-    assert_eq!((tally.sheets, tally.splits), (725, 261), "the sample's sheets and splits at {DEFAULT_TEXT_SIZE} px");
+    assert_eq!((tally.sheets, tally.splits), (723, 261), "the sample's sheets and splits at {DEFAULT_TEXT_SIZE} px");
     assert_eq!(tally.longest, (16, "Psalm 119".to_string()));
 }
 
@@ -173,7 +173,7 @@ fn every_chapter_deals_onto_sheets_whole() {
     }
     report("everything", &tally, started);
     assert_eq!(tally.chapters, 1_402 + 2, "every chapter, the preface and the glossary");
-    assert_eq!((tally.sheets, tally.splits), (4_668, 1_743), "the whole book's sheets and splits at {DEFAULT_TEXT_SIZE} px");
+    assert_eq!((tally.sheets, tally.splits), (4_653, 1_725), "the whole book's sheets and splits at {DEFAULT_TEXT_SIZE} px");
     assert_eq!(tally.longest, (16, "Psalm 119".to_string()));
 }
 

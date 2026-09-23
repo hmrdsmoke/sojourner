@@ -34,7 +34,7 @@ It is being built in the open and is not finished. What works today:
   and a page number, and split between lines the way a printer would (no
   single line left behind, no heading at the foot of a page). The text is
   measured by the same engine that draws it, so every machine sets the same
-  sheets, and `cargo test` pins the count: 4,668 sheets at the default size,
+  sheets, and `cargo test` pins the count: 4,653 sheets at the default size,
   none overflowing, nothing lost or doubled in the dealing. Ctrl+plus and
   Ctrl+minus change the text size; the sheets are set afresh.
 - A Contents sidebar, the trail panel; it opens where you left off.

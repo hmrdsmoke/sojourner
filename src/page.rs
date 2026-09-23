@@ -202,13 +202,18 @@ pub struct Piece {
     pub link: Option<PageLink>,
 }
 
+/// Every piece is set in the book face — never the system's, whose
+/// widths differ from machine to machine and would make the same chapter
+/// break into different lines on different computers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Face {
     /// The paragraph's own face.
     Body,
     Italic,
-    /// The interface face: verse numbers, markers, glossary keywords.
-    Sans,
+    Bold,
+    /// The upright regular, whatever the paragraph's face: verse numbers
+    /// and markers, which are the same in a superscription as in prose.
+    Upright,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -474,7 +479,7 @@ pub fn set_content(shape: Shape, content: &[Inline], mut setter: Option<&mut Set
                 }
                 pieces.push(Piece {
                     text: format!("{label}\u{A0}"),
-                    face: Face::Sans,
+                    face: Face::Upright,
                     scale: Scale::Number,
                     ink: Ink::Accent,
                     verse,
@@ -484,7 +489,8 @@ pub fn set_content(shape: Shape, content: &[Inline], mut setter: Option<&mut Set
             Inline::Text(run) => {
                 let face = match run.style {
                     TextStyle::Selah | TextStyle::Hebrew | TextStyle::NoteQuote | TextStyle::NoteAlternate => Face::Italic,
-                    TextStyle::Keyword => Face::Sans,
+                    // A glossary entry's keyword, bold as in print.
+                    TextStyle::Keyword => Face::Bold,
                     _ => Face::Body,
                 };
                 let ink = if run.style == TextStyle::WordsOfJesus { Ink::Red } else { ink };
@@ -518,7 +524,7 @@ pub fn set_content(shape: Shape, content: &[Inline], mut setter: Option<&mut Set
                     }
                     None => (None, None),
                 };
-                pieces.push(Piece { text: "†".to_string(), face: Face::Sans, scale: Scale::Number, ink: Ink::Accent, verse, link });
+                pieces.push(Piece { text: "†".to_string(), face: Face::Upright, scale: Scale::Number, ink: Ink::Accent, verse, link });
             }
             Inline::CrossRef(_) => {
                 let (verse, link) = match setter.as_deref_mut() {
@@ -531,7 +537,7 @@ pub fn set_content(shape: Shape, content: &[Inline], mut setter: Option<&mut Set
                     }
                     None => (None, None),
                 };
-                pieces.push(Piece { text: "‡".to_string(), face: Face::Sans, scale: Scale::Number, ink: Ink::Accent, verse, link });
+                pieces.push(Piece { text: "‡".to_string(), face: Face::Upright, scale: Scale::Number, ink: Ink::Accent, verse, link });
             }
         }
     }
@@ -581,7 +587,8 @@ pub fn shaped_span<'a>(text: impl IntoFragment<'a>, piece: &Piece, g: &Geometry)
     let mut s = span(text).font(match piece.face {
         Face::Body => g.font,
         Face::Italic => SERIF_ITALIC,
-        Face::Sans => Font::DEFAULT,
+        Face::Bold => SERIF_BOLD,
+        Face::Upright => SERIF,
     });
     match piece.scale {
         Scale::Body => {}

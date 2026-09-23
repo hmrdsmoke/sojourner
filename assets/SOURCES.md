@@ -1,0 +1,280 @@
+# Sources & Lineage
+
+Sojourner does not author scripture. Every text it displays is someone else's
+work, and this file records where each piece came from, under what terms, and
+what (if anything) Sojourner changed. If something on screen is wrong, this is
+where to start tracing it.
+
+Sojourner's own code is licensed GPL-3.0 (see LICENSE). The licenses recorded
+below belong to the data, not the code. Sojourner does not and cannot change
+them.
+
+---
+
+## 1. Bible text — World English Bible (WEB), Classic edition
+
+| | |
+|---|---|
+| Work | World English Bible, Classic edition ("2020 stable text edition"), full ecumenical book set |
+| Publisher | eBible.org — Michael Paul Johnson, editor |
+| Home | https://worldenglish.bible — https://ebible.org/web/ |
+| Basis, as stated by the publisher | American Standard Version (1901); Biblia Hebraica Stuttgartensia (Old Testament); Greek Majority Text (New Testament); Deuterocanon from the Revised Version Apocrypha and Brenton's Septuagint |
+| File obtained | https://ebible.org/Scriptures/eng-web_usfm.zip |
+| Obtained | 2026-09-22, by the author, directly from the publisher |
+| Publisher build stamp | "HTML generated with Haiola by eBible.org 22 Sep 2026 from source files dated 22 Sep 2026" (from copr.htm) |
+| SHA-256 of the zip | `fc578675b0f8fedbc0120920e53e89060fac4d6499270ab99964b913eaad6d36` |
+| Format | USFM 3, UTF-8. 83 files: front matter, 39 Old Testament books, 15 Deuterocanonical files (some hold several traditional books: Greek Daniel carries Susanna, Bel and the Dragon and the Song of the Three; Baruch carries the Letter of Jeremiah), 27 New Testament books, glossary |
+| License | Public domain, declared by the publisher. The publisher's statement is kept verbatim as `copr.htm` inside the committed zip (unzipped to `assets/web-usfm/` for development) |
+| Publisher's condition | "World English Bible" is a trademark of eBible.org. The publisher asks that anyone who changes the actual text not call the result the World English Bible |
+| Publisher's signing key | `keys.asc` inside the committed zip (PGP, mljohnson.org) |
+
+### What Sojourner does with it
+
+- Shows every word the publisher shipped: all 83 files, including footnotes,
+  the translators' cross-references, section titles, Psalm superscriptions,
+  the front matter and the glossary. Nothing added, nothing removed.
+- Does not change the text. The conversion from USFM to Sojourner's internal
+  format is done by code in this repository and is verified (below).
+- Keeps the publisher's rendering of the divine name, "Yahweh". The source
+  texts distinguish YHWH from Elohim ("God") and Adonai ("Lord"); the common
+  small-capitals "LORD" convention hides that distinction, and the Classic
+  edition does not use it.
+- Shelves the Deuterocanon after the New Testament, as a labeled section.
+  The publisher's file order places these books between the testaments;
+  Sojourner reorders for display only. The books themselves are unchanged.
+- Preserves the publisher's word-level Strong's tags (`\w ...|strong="..."`)
+  in the data but does not display them. The publisher's alignment is
+  machine-generated and approximate (e.g. Genesis 1:1 tags "God" with the
+  number for "heavens"); it would need its own verification before it could
+  be shown.
+
+### Verification
+
+- Independent witness: TehShrike/world-english-bible, a separate JSON
+  conversion of the same WEB text (commit `68669ba3be9719ae4d1135b19d9e0b6587b7c356`,
+  2025-11-24, https://github.com/TehShrike/world-english-bible). It is not
+  shipped with Sojourner and is used only to cross-check Sojourner's own
+  conversion. Its package declares no data license, which is one reason it is
+  not shipped.
+- 2026-09-22: Sojourner's parser (`src/text/usfm.rs`) and its proof
+  (`tests/witness.rs`, run by `cargo test`) are in place. The census test
+  asserts every count measured on the raw files: 83 books, 1,402 chapters,
+  38,058 verse markers (23,145 OT / 6,955 Deuterocanon / 7,958 NT), 1,855
+  footnotes, 363 cross-references, 677,690 word tags, 23,338 poetry lines,
+  9,254 paragraphs, 1,070 stanza breaks, 139 superscriptions, 6 bridged verse
+  numbers; and that the only empty verses in the Protestant canon are the
+  five footnoted ones listed below.
+- 2026-09-22: verse-by-verse comparison against the JSON witness: all 31,103
+  verses of the 66 Protestant books exist in both, none missing, none extra.
+  The wording differs in 6,362 verses (4,488 punctuation or quote spacing
+  only; 1,874 wording), all in one direction — "in the earth" → "on the
+  earth", "I come quickly" → "I am coming soon", "I will cause the captivity
+  of Judah to return" → "I will restore the fortunes of Judah" — which shows
+  the witness is a pre-2020 snapshot of the WEB, before the publisher's
+  language updates were finished. It therefore proves structure, not
+  wording.
+- 2026-09-22: word-for-word proof against the publisher's own rendering.
+  Witness: the HTML edition of the WEB, generated by the publisher's tool
+  (Haiola) from the same source files as the USFM zip, on the same day.
+  File https://ebible.org/Scriptures/eng-web_html.zip, obtained 2026-09-22
+  by the author, SHA-256
+  `cf6fec91bc4dc3d18f95faf2da10bc871affae4f9f43f69af3dfd26da0545b63`,
+  kept at `assets/eng-web_html.zip` (not shipped; read by the test).
+  Result: all 38,058 verses of all 81 books — Old Testament, Deuterocanon
+  and New Testament — have identical words and punctuation in Sojourner's
+  parse and in the publisher's rendering. The comparison ignores two
+  typographic matters, on both sides equally: whitespace between two
+  adjacent quotation marks (the source writes `’ ”` in three verses and
+  `’”` in 865; the renderer normalizes all of them to a non-breaking space)
+  and whitespace beside an em-dash (the renderer sets "Selah" as its own
+  block, Psalm 68:32). Nothing else is ignored. The renderer's own counts
+  agree with the parser's as well: 38,058 verse spans, 2,290 words-of-Jesus
+  spans, 2,218 note callers (1,855 footnotes + 363 cross-references), and
+  the same number of blocks of every kind.
+- The proof is `cargo test`. With both witness files present it runs four
+  checks (census, footnoted-verses, JSON structure, publisher HTML) in
+  about a second; without them, the census and footnoted-verses checks
+  still run against the zip compiled into the binary.
+- Text-critical features of the WEB that could be mistaken for missing text,
+  each explained by the publisher's own footnote at that verse:
+  Luke 17:36, Acts 8:37, Acts 15:34, Acts 24:7 (verses found in the Textus
+  Receptus but not the Majority Text; the verse number is kept and the TR
+  wording is given in the footnote), and Romans 16:25–27 (the doxology is
+  placed after Romans 14:23 per the Majority Text; Romans 14 therefore has
+  26 verses and Romans 16 ends at verse 25).
+
+---
+
+## 2. Cross-references — openbible.info
+
+| | |
+|---|---|
+| Work | Bible cross-reference data from openbible.info (Stephen Smith) |
+| Home | https://www.openbible.info/labs/cross-references/ |
+| Basis, as stated by the compiler | Primarily the Treasury of Scripture Knowledge (public domain, R. A. Torrey and others, 19th century), seeded with openbible.info's own Topical Bible and Bible-search data; relevance votes contributed by the site's users |
+| File obtained | https://a.openbible.info/data/cross-references.zip (contains `cross_references.txt`) |
+| Obtained | 2026-09-22, by the author, directly from the compiler's site |
+| Snapshot | 2026-09-21, as stamped in the file's own header line (`#www.openbible.info CC-BY 2026-09-21`). The set is regenerated as votes change; this hash pins one snapshot |
+| SHA-256 of the zip | `83e9db0a08054ed99848531512729f0190dbbac85416f408f2362b5dc36d421d` |
+| Format | Tab-separated text, one reference per line: from-verse, to-verse (single verse or range), votes. 344,799 references, 66 Protestant books, OSIS book abbreviations, KJV/ESV-style verse numbering |
+| License | Creative Commons Attribution 4.0 (CC BY 4.0), declared on the compiler's page and in the file header. Attribution: "Cross-reference data from openbible.info, CC BY 4.0" |
+
+### What Sojourner does with it
+
+- Ships it whole, compiled into the binary (`assets/cross-references.zip`),
+  and resolves every reference against the parsed WEB text at startup
+  (`src/crossrefs.rs`). No reference is discarded.
+- Shows a verse's links most-voted first, using the compiler's vote column
+  as the relevance order. The votes are the compiler's users' judgment, not
+  Sojourner's.
+- Renumbers references at exactly two places where the set's numbering
+  differs from the WEB's, both explained by the translators' own footnotes:
+  Romans 16:25–27 → 14:24–26 (the doxology, placed after 14:23 in the WEB
+  per the Majority Text), and 3 John 15 → 14 (the set splits the last verse
+  of 3 John; the WEB keeps one verse). 226 references are affected. The
+  table is `to_web_numbering` in `src/crossrefs.rs`; nothing else is
+  changed.
+- Keeps the translators' own 363 cross-references from the WEB text (the
+  `\x` notes in the USFM) as a separate, labeled source. They are the
+  publisher's, not openbible.info's.
+
+### Verification
+
+- 2026-09-22: `cargo test` (`tests/crossrefs.rs`) asserts that all 344,799
+  references resolve to verses that exist in the WEB text (0 unresolved),
+  that exactly 226 verse numbers were renumbered by the table above, that
+  29,363 verses carry outgoing links, that 18 references are ranges running
+  from the end of one book into the next (e.g. 2 Chronicles 36:22 – Ezra
+  1:3) and are kept as such, that links are ordered most-voted first, and
+  that the renumbering works in both directions (the doxology's own
+  outgoing links appear from WEB Romans 14:25). Spot check: the most-voted
+  reference for Genesis 1:1 is John 1:1–3.
+
+---
+
+## 3. Text-to-speech voice — LJ Speech, high quality (`en_US-ljspeech-high`)
+
+| | |
+|---|---|
+| Work | Piper voice "ljspeech (high)": a single-speaker English voice model, US English, female, 22,050 Hz |
+| Trained by | Bryce Beattie (the voice card's training note is his, in the first person; his page is https://brycebeattie.com/files/tts/) |
+| Distributed by | The Piper voices repository, rhasspy/piper-voices, maintained by Michael Hansen — https://huggingface.co/rhasspy/piper-voices, directory `en/en_US/ljspeech/high/` |
+| Files obtained | `en_US-ljspeech-high.onnx` (the model), `en_US-ljspeech-high.onnx.json` (its configuration), `MODEL_CARD` (the voice card), from that directory |
+| Obtained | 2026-09-22, by the author, directly from the repository |
+| SHA-256, model | `5d4f08ba6a2a48c44592eed3ce56bf85e9de3dd4e20df90541ae68a8310c029a` (114,199,011 bytes) |
+| SHA-256, configuration | `7e1f4634af596d83cca997fb7a931ba80b70f8a316a2655ee69c55365e0ace14` (4,970 bytes) |
+| SHA-256, voice card | `289f7421072d689a3d91f6c632f486af46f9b8b04417536104a4ea667b8a394b` (513 bytes) |
+| Format | Piper voice, `piper_version` 1.0.0: a VITS speech model exported to ONNX, driven by espeak-ng phonemes (espeak voice `en`, 157 phoneme ids), one speaker, 22,050 Hz, quality "high". The configuration's default inference settings are noise 0.667, length 1.0, noise-w 0.333 |
+| Training data, as stated by the voice card | The LJ Speech Dataset (Keith Ito and Linda Johnson, 2017): "a public domain speech dataset consisting of 13,100 short audio clips of a single speaker reading passages from 7 non-fiction books" — about 24 hours of Linda Johnson's LibriVox recordings, 2016–17. https://keithito.com/LJ-Speech-Dataset/ |
+| Training, as stated by the voice card | "Trained from scratch for 1000 epochs on medium quality settings using the LJ Speech dataset. I reencoded the recordings to a bit rate of 22500 Hz so it would match other voices released for Piper TTS." |
+| License, dataset | Public domain. The dataset page: "This dataset is in the public domain in the US (and most likely other countries as well)." The voice card: "License: public domain" |
+| License, model files | MIT, declared by the distributing repository for its contents (`license: mit` in the repository's README front matter) |
+
+### What Sojourner does with it
+
+- Reads the text aloud with this voice, one verse at a time, on this
+  machine. Nothing is sent anywhere; the voice runs entirely locally.
+- Ships the model unchanged. The voice card is kept verbatim at
+  `assets/voices/en_US-ljspeech-high.MODEL_CARD`, and the configuration at
+  `assets/voices/en_US-ljspeech-high.onnx.json`, both committed. The model
+  itself (114 MB) is too large for the repository and is not committed; it is
+  obtained from the URL above when the app is built or packaged, and the
+  hash above is what it must match. `src/voice/files.rs` says where the app
+  looks for it.
+- Speaks the words of a verse as printed. Verse numbers, footnote markers
+  and cross-reference markers are not spoken.
+
+### Verification
+
+- 2026-09-22: `cargo test` (`tests/voice.rs`) opens the model with the
+  engine below, speaks the first line of Psalm 23 from the WEB, and checks
+  that the result is 22,050 Hz audio of a sensible length (about five
+  seconds) with real signal in it. It writes the sound to
+  `target/voice-check.wav` for a person to listen to. The test skips,
+  saying so, when the model or the runtime library is not present. On the
+  first run (a debug build, two cores): model loaded in 2.2 s, 4.9 s of
+  speech synthesized in 2.1 s — faster than it plays, which is what reading
+  along verse by verse needs.
+- The voice was chosen by ear by the author from the English Piper voices,
+  with each candidate's card fetched and read for its dataset and license
+  first. The chosen voice's dataset is public domain and its model files
+  are MIT; nothing about it is licensed for non-commercial use only.
+
+---
+
+## 4. Speech engine
+
+Sojourner does not run the Piper program. It runs the voice model above
+through the pieces below, each a separately licensed work. All of them are
+build-time dependencies fetched by hash-pinned package tooling (Cargo) except
+ONNX Runtime, which is a binary obtained separately.
+
+| Piece | What it does | Version | License | Source |
+|---|---|---|---|---|
+| Piper (lineage) | Defines the voice format the model above is in, and trained it. Sojourner compiles none of its code | — | Original project rhasspy/piper, MIT, archived by its owner on 2025-10-06 with the notice "Development has moved"; its successor OHF-Voice/piper1-gpl, GPL-3.0 | https://github.com/rhasspy/piper — https://github.com/OHF-Voice/piper1-gpl |
+| piper-rs | Rust implementation of Piper inference: reads the configuration, turns a phoneme string into model input, runs the model. Sojourner uses only that; see the note on phonemes below | 0.2.0 (crates.io, published 2026-05-21) | MIT | https://github.com/thewh1teagle/piper-rs |
+| espeak-rs, espeak-rs-sys | Rust binding to espeak-ng, which the `-sys` crate builds from a bundled copy of the espeak-ng source. Sojourner calls the `-sys` binding directly (`src/voice/phonemes.rs`) | 0.2.0 | MIT (the binding) | same repository |
+| espeak-ng | Turns text into phonemes for the model (the model was trained on its `en` phonemes) | 1.52.0.1, as bundled in espeak-rs-sys 0.2.0 | GPL-3.0-or-later, per the license headers of every source file. The bundled copy omits espeak-ng's top-level COPYING file; the `ucd-tools` component carries its own COPYING (GPL) and COPYING.UCD (Unicode license) | https://github.com/espeak-ng/espeak-ng |
+| sonic | Speed-change library that espeak-ng's wave generator calls for its own fast speech rates; Sojourner never calls it, but espeak-ng's build requires it. Taken from the system's `libsonic-dev` package and linked statically by Sojourner's own `build.rs` (see below). When no libsonic is installed, espeak-ng's CMake instead clones this exact commit from GitHub at build time — the one network access in the build, and the reason `libsonic-dev` is required | the system's package (0.2.0 on Pop!_OS 24.04); git commit `fbf75c3d6d846bad3bb3d456cbc5d07d9fd8c104` when fetched | Apache-2.0 (Bill Cox) | https://github.com/waywardgeek/sonic |
+| ort, ort-sys | Rust binding to ONNX Runtime. Built with `load-dynamic`, so the runtime library is loaded at startup from a path Sojourner chooses rather than downloaded at build time | 2.0.0-rc.12 (the exact version piper-rs 0.2.0 requires) | MIT OR Apache-2.0 | https://github.com/pykeio/ort |
+| rodio | Plays the voice's audio: queues each verse's samples and mixes them into the output stream. Built without its file decoders (Sojourner plays no files) | 0.22 | MIT OR Apache-2.0 | https://github.com/RustAudio/rodio |
+| cpal | rodio's way to the sound card: on Linux, ALSA — which on Pop!_OS is PipeWire's ALSA compatibility layer. Building it needs the ALSA headers (`libasound2-dev`) | 0.18 | Apache-2.0 | https://github.com/RustAudio/cpal |
+| ONNX Runtime | Runs the model | 1.28.0, Linux x64 release build, git commit `da9b5e364c465de65c49d91e696cd6485270757f` | MIT (Microsoft; the tarball's LICENSE and ThirdPartyNotices.txt) | https://github.com/microsoft/onnxruntime/releases/download/v1.28.0/onnxruntime-linux-x64-1.28.0.tgz — SHA-256 `a3e1b79d7bb1bf09696ce675f49e4064e6c81f6202b8225624fff0e93f8d6407` |
+
+### What Sojourner does with it
+
+- Loads `libonnxruntime.so` from a known place at startup
+  (`src/voice/files.rs`: an environment variable, the Flatpak's `/app/lib`,
+  or `assets/onnxruntime/*/lib` in a source checkout). Nothing is
+  downloaded at build time or at run time. The tarball is extracted into
+  `assets/onnxruntime/` for development and is not committed.
+- Links espeak-ng statically, built from the bundled source by
+  espeak-rs-sys at compile time. This is why building Sojourner needs
+  `cmake`, `clang` and `libclang-dev` (for the generated bindings) and
+  `libsonic-dev`; playback adds `libasound2-dev`. espeak-ng's CMake finds the system's sonic and records
+  the dependency for itself, but a static library carries no link
+  information and espeak-rs-sys does not pass it on, so the final link
+  would fail with undefined `sonic*` symbols; Sojourner's `build.rs`
+  supplies the missing line, linking `libsonic.a` statically so the
+  finished binary needs no libsonic.so at run time. Its phoneme data is
+  compiled at the same time and found through the path compiled in; a
+  packaged build must ship that data directory and point espeak-ng at it,
+  and must provide sonic itself, since a packaging build has no network.
+- Since espeak-ng is GPL-3.0-or-later and is linked into the binary, the
+  binary as a whole is distributed under the GPL — which Sojourner's own
+  license already is.
+- Makes the phonemes itself, the way Piper's own program does. The voice
+  was trained on phoneme strings that keep the clause punctuation of the
+  text and a space between clauses, and it synthesizes one sentence at a
+  time with a short silence (0.2 s) between sentences. piper-rs's text
+  path strips the punctuation and runs the clauses together, which left
+  the voice with no pauses and no sentence shape; so Sojourner asks
+  espeak-ng for the clauses through espeak-rs-sys, restores the punctuation
+  that ended each one, and hands piper-rs one sentence of phonemes at a
+  time (`src/voice/phonemes.rs`, `src/voice/piper.rs`).
+
+### Verification
+
+- 2026-09-22: the test in section 3 exercises the whole chain — files
+  found, runtime loaded, espeak-ng phonemizing, model run — and passes.
+- 2026-09-22: `cargo test` (`tests/phonemes.rs`) checks the phonemes
+  against Piper's convention on sample verses — commas, colons and
+  semicolons kept with a space after them, sentences split at `.` `?` `!`,
+  the publisher's curly quotes, parentheses and apostrophes understood —
+  and then runs all 38,029 verses that have words through espeak-ng
+  (55,834 sentences) and confirms that every phoneme that comes out is one
+  the voice has an id for: none is dropped. The 29 wordless verse numbers
+  (Luke 17:36, Acts 8:37, 15:34, 24:7, Romans 16:25, and 24 in Sirach)
+  each carry the translators' footnote and nothing to say.
+- 2026-09-22: `cargo test` (`tests/reader.rs`) runs the reading-along
+  thread with a stand-in voice and no sound device and checks that it
+  announces each verse in order, passes over verses with no words, pauses
+  and resumes in place, goes back a verse and skips forward on command,
+  and reports when it is done. Listening is the test of the real thing.
+- 2026-09-22: known limitation, to be addressed as its own piece of work.
+  espeak-ng's English rules mispronounce some proper names as spelled:
+  it reads "Job" as the word "job", and gets, among others, "Zechariah",
+  "Melchizedek", "Gethsemane", "Simeon", "Ecclesiastes", "Manasseh" and
+  "Gehenna" wrong; "Yahweh" it reads correctly (YAH-way). Sojourner will
+  carry a pronunciation table for the names of scripture, with its source
+  recorded here when it is added.

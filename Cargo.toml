@@ -1,0 +1,30 @@
+[package]
+name = "sojourner"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Reads the publisher's USFM zip that is compiled into the binary.
+# Pure-Rust deflate only; no compressors, no C libraries.
+zip = { version = "8", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+
+# Speech. piper-rs runs the voice model and compiles espeak-ng in; ort is its
+# ONNX Runtime binding. `load-dynamic` makes ort load libonnxruntime.so at
+# startup from a path we choose (src/voice/files.rs) instead of downloading
+# a copy at build time, which a Store build could never do.
+piper-rs = "0.2"
+# piper-rs 0.2 pins this exact ort release; the pin is theirs, not ours.
+ort = { version = "=2.0.0-rc.12", features = ["load-dynamic"] }
+# Plays what the voice makes. Only the playback half: no file decoders,
+# since Sojourner never plays a file.
+rodio = { version = "0.22", default-features = false, features = ["playback"] }
+# piper-rs's espeak-ng binding, used directly for phonemes with punctuation
+# (src/voice/phonemes.rs); serde_json reads the voice's configuration.
+espeak-rs-sys = "0.2"
+serde_json = "1"
+
+[dependencies.libcosmic]
+git = "https://github.com/pop-os/libcosmic.git"
+default-features = false
+features = ["tokio", "winit", "wgpu"]
+

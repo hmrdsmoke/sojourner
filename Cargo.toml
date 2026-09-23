@@ -2,6 +2,8 @@
 name = "sojourner"
 version = "0.1.0"
 edition = "2024"
+# `cargo run` is the app; the tools in src/bin are run by name.
+default-run = "sojourner"
 
 [dependencies]
 # Reads the publisher's USFM zip that is compiled into the binary.

@@ -15,6 +15,7 @@
 //! assets/SOURCES.md.
 
 pub mod files;
+pub mod names;
 pub mod phonemes;
 pub mod piper;
 pub mod reader;

@@ -22,10 +22,22 @@ use std::ffi::{c_char, c_void, CStr, CString};
 use std::path::Path;
 use std::sync::{Mutex, OnceLock};
 
+use super::names::Names;
 use super::Error;
 
 /// The result of initializing espeak-ng, kept so it happens once.
 static INIT: OnceLock<Result<(), String>> = OnceLock::new();
+
+// espeak-ng reads `[[phonemes]]` in its input only when this global of its
+// is set, and only `espeak_Synth` sets it (from the `espeakPHONEMES` flag);
+// `espeak_TextToPhonemes`, the call this module makes, never touches it.
+// Sojourner never synthesizes through espeak-ng, so it sets the flag once
+// after initializing and it stays set. The global is espeak-ng 1.52's
+// (`translate.c`, statically linked in by espeak-rs-sys 0.2.0);
+// tests/names.rs proves it still works whenever that crate is updated.
+unsafe extern "C" {
+    static mut option_phoneme_input: std::ffi::c_int;
+}
 
 /// espeak-ng keeps its state in globals; one caller at a time.
 static ESPEAK: Mutex<()> = Mutex::new(());
@@ -50,6 +62,11 @@ pub fn init(data_dir: Option<&Path>) -> Result<(), Error> {
             )
         };
         if sample_rate > 0 {
+            // SAFETY: a plain int in espeak-ng's globals, written under the
+            // same lock every other call to espeak-ng takes.
+            unsafe {
+                option_phoneme_input = 1;
+            }
             Ok(())
         } else {
             Err(format!(
@@ -69,8 +86,15 @@ pub fn init(data_dir: Option<&Path>) -> Result<(), Error> {
 /// convention: each clause's phonemes followed by the punctuation that
 /// ended it, a space after a clause-internal mark (`,` `:` `;`), and a
 /// sentence ending at `.` `?` `!` or the end of the text. `voice` is the
-/// espeak-ng voice named in the model's configuration ("en").
+/// espeak-ng voice named in the model's configuration ("en"). Names in the
+/// bundled table (`names.rs`) are said as the table says.
 pub fn sentences(text: &str, voice: &str) -> Result<Vec<String>, Error> {
+    let respelled = Names::bundled().respell(text);
+    sentences_of(&respelled, voice)
+}
+
+/// `sentences`, with the text taken as it is — no name table.
+pub fn sentences_of(text: &str, voice: &str) -> Result<Vec<String>, Error> {
     let _guard = ESPEAK.lock().unwrap_or_else(|e| e.into_inner());
 
     let voice_c = CString::new(voice).map_err(|_| Error::Engine("voice name has a NUL in it".into()))?;

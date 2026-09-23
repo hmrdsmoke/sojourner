@@ -2,10 +2,11 @@
 
 //! Sojourner's library half. The app binary (`main.rs`) is the COSMIC
 //! window; everything that doesn't need a window — the Bible text, its
-//! parser, and later the cross-reference web and TTS — lives here so it can
-//! be tested without one.
+//! parser, the cross-reference web, the voice, and the typesetting of
+//! chapters into pages — lives here so it can be tested without one.
 
 pub mod crossrefs;
+pub mod page;
 pub mod text;
 pub mod voice;
 

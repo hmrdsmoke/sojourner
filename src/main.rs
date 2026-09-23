@@ -9,10 +9,18 @@
 //! The book opens on a title page. Turning the page goes through the
 //! publisher's own preface, then the Old Testament, the New Testament, the
 //! Deuterocanon, and finally the publisher's glossary — every file in the
-//! zip, in Sojourner's shelf order. Each chapter is one page, laid out from
-//! the parsed blocks. Pages turn with the header buttons (Previous on the
-//! left, Next on the right, the title between them) or the arrow keys, and
-//! a Contents sidebar opens on the left to jump anywhere.
+//! zip, in Sojourner's shelf order. Pages turn with the arrows beside the
+//! sheet or the arrow keys, and a Contents sidebar opens on the left to jump
+//! anywhere.
+//!
+//! The page is a sheet of fixed size, whatever the window is: a chapter is
+//! typeset into as many sheets as it needs, each holding what fits, and the
+//! window shows one sheet at a time — centered on the desk when the window
+//! is larger than the sheet, scrolling when it is smaller. Typesetting
+//! measures the text with the same engine that draws it (see "Typesetting"
+//! below), so what is measured to fit does fit, to the pixel. The one
+//! setting so far, the text size, changes with Ctrl+plus and Ctrl+minus and
+//! re-sets every page.
 //!
 //! The trail: verse numbers, footnote markers (†) and the translators' own
 //! cross-reference markers (‡) are links. Clicking one opens the right-hand
@@ -24,18 +32,16 @@
 //!
 //! Reading aloud: Play (or Space) reads the chapter on the page, verse by
 //! verse, with the voice in `sojourner::voice`. The verse being spoken is
-//! highlighted and the page keeps it in view; ⏮ and ⏭ (Shift+Up/Down) go
-//! back a verse or skip one, Pause holds the place, and a chapter that ends
-//! while its page is showing runs on into the next. "Read from here" in the
-//! trail panel starts at any verse.
+//! highlighted and the page turns to keep it in view; ⏮ and ⏭ (Shift+Up/
+//! Down) go back a verse or skip one, Pause holds the place, and a chapter
+//! that ends while its page is showing runs on into the next. "Read from
+//! here" in the trail panel starts at any verse.
 //!
 //! The place the reader left off is remembered (through cosmic-config's
-//! state store, as book code and chapter, so it survives updates to the
-//! text), and the book opens there next time.
-//!
-//! True fixed-size page flipping (a screenful per page) is a later step; for
-//! now a long chapter scrolls.
+//! state store, as book code, chapter and verse, so it survives updates to
+//! the text and changes of text size), and the book opens there next time.
 
+use std::collections::HashMap;
 use std::sync::Arc;
 
 use cosmic::app::context_drawer::{self, ContextDrawer};
@@ -44,18 +50,23 @@ use cosmic::cosmic_config::{Config, ConfigGet, ConfigSet};
 use cosmic::iced::core::text::LineHeight;
 use cosmic::iced::keyboard::{self, key::Named};
 use cosmic::iced::futures::Stream;
-use cosmic::iced::widget::scrollable::{scroll_by, scroll_to, snap_to, AbsoluteOffset, RelativeOffset};
+use cosmic::iced::widget::scrollable::{scroll_by, scroll_to, AbsoluteOffset, Direction, Scrollbar};
 use cosmic::iced::widget::text::{Rich, Span};
 use cosmic::iced::widget::{rich_text, span, Id};
-use cosmic::iced::{self, Color, Event, Font, Length, Pixels, Size, Subscription};
-use cosmic::widget::{button, column, container, divider, flex_row, icon, row, scrollable, space, text};
+use cosmic::iced::{self, Border, Color, Event, Font, Length, Pixels, Shadow, Size, Subscription, Vector};
+use cosmic::widget::{button, column, container, divider, flex_row, icon, responsive, row, scrollable, space, text};
 use cosmic::{Application, ApplicationExt, Element};
 use serde::{Deserialize, Serialize};
 
 // The library's module is also called `text`, which collides with the text
 // *widget*; call the library side `scripture` in this file.
+use sojourner::page::{
+    chapter_title, geometry, is_air, paginate, set_content, shaped_span, typeset_chapter, Geometry, Ink, Leaf, PageLink, Par,
+    Setter, Shape, DEFAULT_TEXT_SIZE, LARGEST_TEXT, MARGIN_X, MARGIN_Y, SERIF, SERIF_BOLD, SERIF_ITALIC, SHEET_HEIGHT,
+    SHEET_WIDTH, SMALLEST_TEXT, TEXT_HEIGHT, TEXT_WIDTH,
+};
 use sojourner::text as scripture;
-use sojourner::text::{Block, BlockKind, Book, CrossRef, Footnote, Inline, Section, TextStyle, VerseRef};
+use sojourner::text::{CrossRef, Footnote, Inline, Section, TextStyle, VerseRef};
 use sojourner::voice::reader::{self, Reader, Verse};
 use sojourner::Library;
 
@@ -63,40 +74,16 @@ use sojourner::Library;
 // Type
 // ────────────────────────────────────────────────────────────────────────────
 
-/// A serif face for the page. `Family::Serif` asks the system for its
-/// default serif; on Pop!_OS that is usually DejaVu Serif or Noto Serif. A
-/// bundled book face can replace this later without touching the layout.
-const SERIF: Font = Font {
-    family: iced::font::Family::Serif,
-    ..Font::DEFAULT
-};
+/// The sheet's size, margins and text sizes are the library's
+/// (`sojourner::page`), since the typesetting that fills the sheets lives
+/// there; this file only draws them.
 
-const SERIF_ITALIC: Font = Font {
-    family: iced::font::Family::Serif,
-    style: iced::font::Style::Italic,
-    ..Font::DEFAULT
-};
+/// Air around the sheet on the desk, and the width of the page-turn arrows
+/// beside it.
+const DESK_AIR: f32 = 16.0;
+const ARROW_WIDTH: f32 = 56.0;
 
-const SERIF_BOLD: Font = Font {
-    family: iced::font::Family::Serif,
-    weight: iced::font::Weight::Bold,
-    ..Font::DEFAULT
-};
-
-/// Reading measure: the text column never grows wider than this, however
-/// wide the window is. That single cap is most of the "page" feel.
-const MEASURE: f32 = 620.0;
-
-/// Body text size and the size of the small verse numbers set into it.
-const BODY: f32 = 18.0;
-const VERSE_NUMBER: f32 = 11.0;
-
-/// Every line of body text is this tall, whatever is on it. Given as an
-/// absolute height, not a multiple, so a line that happens to start with a
-/// small verse number is exactly as tall as its neighbours.
-const LINE: LineHeight = LineHeight::Absolute(Pixels(BODY * 1.5));
-
-/// The panel sets text a little smaller than the page.
+/// The panel sets text a little smaller than the page, and does not change.
 const PANEL_BODY: f32 = 16.0;
 const PANEL_LINE: LineHeight = LineHeight::Absolute(Pixels(PANEL_BODY * 1.5));
 
@@ -104,12 +91,9 @@ const PANEL_LINE: LineHeight = LineHeight::Absolute(Pixels(PANEL_BODY * 1.5));
 /// trailing off. Clicking the link shows the whole thing.
 const QUOTE_CHARS: usize = 260;
 
-/// How far one press of Up or Down scrolls the page: two lines of body text.
-const SCROLL_STEP: f32 = BODY * 1.5 * 2.0;
-
-/// Small capitals ("LORD"): the letters after the first, as a share of the
-/// body size.
-const SMALL_CAPS: f32 = 0.8;
+/// How far one press of Up or Down scrolls a window too small for the
+/// sheet: two lines of body text.
+const SCROLL_STEP: f32 = DEFAULT_TEXT_SIZE * 1.5 * 2.0;
 
 // ────────────────────────────────────────────────────────────────────────────
 // State
@@ -126,6 +110,12 @@ pub struct Sojourner {
     shelf: Vec<Slot>,
     /// Where the reader is: the anchor.
     at: Position,
+    /// The body text size, in logical pixels.
+    text_size: f32,
+    /// Chapters typeset into sheets at the current text size, by (slot,
+    /// chapter index). Filled as chapters are turned to; emptied when the
+    /// text size changes.
+    leaves: HashMap<(usize, usize), Vec<Leaf>>,
     /// Whether the Contents sidebar is open on the left.
     contents_open: bool,
     /// The book whose chapter numbers are unfolded in the Contents sidebar.
@@ -143,13 +133,17 @@ pub struct Sojourner {
 }
 
 /// Where the reader left off, as it is saved: the publisher's book code
-/// ("JHN") and the chapter number, or an empty code for the title page.
-/// Codes and numbers rather than positions, so the place survives a change
-/// of edition or shelf order.
+/// ("JHN"), the chapter number and the first verse on the sheet, or an
+/// empty code for the title page. Codes and numbers rather than positions,
+/// so the place survives a change of edition, shelf order or text size.
+/// (Places saved before there were verses have none; that reads as 0, the
+/// start of the chapter.)
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 struct Place {
     book: String,
     chapter: u32,
+    #[serde(default)]
+    verse: u32,
 }
 
 /// A chapter being read aloud.
@@ -173,24 +167,14 @@ enum Slot {
     Book(usize),
 }
 
-/// A place on the shelf: which slot, and which page of it. For a book of
-/// scripture the page is the chapter (0-based); the title page, preface and
-/// glossary each have a single page.
+/// A place on the shelf: which slot, which chapter of it, and which sheet
+/// of the chapter. For a book of scripture the page is the chapter
+/// (0-based); the title page, preface and glossary each have a single page.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Position {
     slot: usize,
     page: usize,
-}
-
-/// What a click on the page means.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum PageLink {
-    /// A verse number: this verse and its cross-references.
-    Verse(VerseRef),
-    /// The n-th footnote marker inside a verse.
-    Note(VerseRef, usize),
-    /// The n-th translators' cross-reference marker inside a verse.
-    Xref(VerseRef, usize),
+    leaf: usize,
 }
 
 /// One stop on the trail.
@@ -210,8 +194,11 @@ pub enum Message {
     Loaded(Result<Arc<Library>, String>),
     NextPage,
     PreviousPage,
-    /// Scroll the page by this many pixels (negative is up).
+    /// Scroll a window too small for the sheet by this many pixels
+    /// (negative is up).
     ScrollPage(f32),
+    /// Make the text this much larger (negative: smaller); 0 resets it.
+    TextSize(f32),
     /// Open or close the Contents sidebar.
     ToggleContents,
     /// Escape, or the drawer's close button: close the trail if it is open,
@@ -243,13 +230,14 @@ pub enum Message {
     StopReading,
 }
 
-/// The one scrollable on the page, so a page turn can put it back to the top.
+/// The scrollable a small window shows the sheet through, so a page turn
+/// can put it back to the top.
 fn page_scroll_id() -> Id {
     Id::new("sojourner-page")
 }
 
 impl Sojourner {
-    /// How many pages a slot has.
+    /// How many chapters (pages) a slot has.
     fn pages(&self, slot: usize) -> usize {
         match (self.shelf[slot], &self.library) {
             (Slot::Title, _) => 1,
@@ -258,40 +246,93 @@ impl Sojourner {
         }
     }
 
-    /// Turn one page forward or back, crossing from slot to slot along the
-    /// shelf and stopping at either cover.
+    /// The sheets of a chapter, typeset if they haven't been yet.
+    fn leaves_of(&mut self, slot: usize, page: usize) -> &[Leaf] {
+        let Slot::Book(i) = self.shelf[slot] else { return &[] };
+        let Some(lib) = self.library.clone() else { return &[] };
+        self.leaves.entry((slot, page)).or_insert_with(|| {
+            let pars = typeset_chapter(&lib.bible.books[i], i as u8, page);
+            paginate(pars, self.text_size)
+        })
+    }
+
+    /// How many sheets a chapter has (one for the title page).
+    fn leaf_count(&mut self, slot: usize, page: usize) -> usize {
+        match self.shelf[slot] {
+            Slot::Title => 1,
+            Slot::Book(_) => self.leaves_of(slot, page).len().max(1),
+        }
+    }
+
+    /// The sheet a verse begins on: the one carrying its number, or failing
+    /// that the one whose verses surround it (a bridged verse asked for by
+    /// its second number), or the first.
+    fn leaf_of_verse(&mut self, slot: usize, page: usize, verse: u32) -> usize {
+        let leaves = self.leaves_of(slot, page);
+        let numbered = leaves.iter().position(|leaf| {
+            leaf.pars
+                .iter()
+                .flat_map(|par| par.pieces.iter())
+                .any(|piece| matches!(piece.link, Some(PageLink::Verse(v)) if v.verse == verse))
+        });
+        numbered
+            .or_else(|| {
+                leaves
+                    .iter()
+                    .position(|leaf| leaf.first_verse.is_some_and(|f| f <= verse) && leaf.last_verse.is_some_and(|l| verse <= l))
+            })
+            .unwrap_or(0)
+    }
+
+    /// The sheet being shown, if it is one of a chapter.
+    fn leaf(&self) -> Option<&Leaf> {
+        self.leaves.get(&(self.at.slot, self.at.page))?.get(self.at.leaf)
+    }
+
+    /// Turn one sheet forward or back, crossing from chapter to chapter and
+    /// slot to slot along the shelf, and stopping at either cover.
     fn turn(&mut self, forward: bool) {
         if self.library.is_none() {
             return;
         }
         let at = self.at;
         self.at = if forward {
-            if at.page + 1 < self.pages(at.slot) {
-                Position { slot: at.slot, page: at.page + 1 }
+            if at.leaf + 1 < self.leaf_count(at.slot, at.page) {
+                Position { leaf: at.leaf + 1, ..at }
+            } else if at.page + 1 < self.pages(at.slot) {
+                Position { slot: at.slot, page: at.page + 1, leaf: 0 }
             } else if at.slot + 1 < self.shelf.len() {
-                Position { slot: at.slot + 1, page: 0 }
+                Position { slot: at.slot + 1, page: 0, leaf: 0 }
             } else {
                 at
             }
+        } else if at.leaf > 0 {
+            Position { leaf: at.leaf - 1, ..at }
         } else if at.page > 0 {
-            Position { slot: at.slot, page: at.page - 1 }
+            let page = at.page - 1;
+            Position { slot: at.slot, page, leaf: self.leaf_count(at.slot, page) - 1 }
         } else if at.slot > 0 {
-            Position { slot: at.slot - 1, page: self.pages(at.slot - 1) - 1 }
+            let slot = at.slot - 1;
+            let page = self.pages(slot) - 1;
+            Position { slot, page, leaf: self.leaf_count(slot, page) - 1 }
         } else {
             at
         };
     }
 
-    /// The page a verse is on.
-    fn position_of(&self, verse: VerseRef) -> Option<Position> {
-        let lib = self.library.as_ref()?;
+    /// The sheet a verse is on.
+    fn position_of(&mut self, verse: VerseRef) -> Option<Position> {
+        let lib = self.library.clone()?;
         let slot = self.shelf.iter().position(|s| *s == Slot::Book(usize::from(verse.book)))?;
         let book = &lib.bible.books[usize::from(verse.book)];
         let page = book.chapters.iter().position(|c| c.number == verse.chapter)?;
-        Some(Position { slot, page })
+        let leaf = self.leaf_of_verse(slot, page, verse.verse);
+        Some(Position { slot, page, leaf })
     }
 
-    /// A page turn or a jump: scroll the page back to its top.
+    /// A page turn or a jump: a window too small for the sheet scrolls back
+    /// to its top. (A window that shows the whole sheet has nothing to
+    /// scroll, and the task finds nothing to do.)
     fn back_to_top() -> Task<Message> {
         scroll_to(page_scroll_id(), AbsoluteOffset { x: 0.0, y: 0.0 }.into())
     }
@@ -380,18 +421,17 @@ impl Sojourner {
         (i as u8 == reading.book && chapter.number == reading.chapter).then(|| reading.verses[reading.index].verse)
     }
 
-    /// Keep the spoken verse in view: scroll the page to the verse's share
-    /// of the chapter. A verse a third of the way through the chapter shows
-    /// about a third of the way down the window — exactly right when every
-    /// verse is the same height, near enough when they aren't.
-    fn follow_along(&self) -> Task<Message> {
-        let Some(reading) = &self.reading else { return Task::none() };
-        if self.spoken_on_page().is_none() {
+    /// Keep the spoken verse in view: if the chapter on the page is the one
+    /// being read and the verse begins on another of its sheets, turn to
+    /// that sheet.
+    fn follow_along(&mut self) -> Task<Message> {
+        let Some(spoken) = self.spoken_on_page() else { return Task::none() };
+        let leaf = self.leaf_of_verse(self.at.slot, self.at.page, spoken);
+        if leaf == self.at.leaf {
             return Task::none();
         }
-        let last = reading.verses.len().saturating_sub(1).max(1) as f32;
-        let y = (reading.index as f32 / last).clamp(0.0, 1.0);
-        snap_to(page_scroll_id(), RelativeOffset { x: 0.0, y }.into())
+        self.at.leaf = leaf;
+        Self::back_to_top()
     }
 
     /// The chapter finished. If its page is still showing, the listener is
@@ -425,14 +465,20 @@ impl Sojourner {
         Config::new_state(Self::APP_ID, 1).ok()
     }
 
+    /// The settings store (cosmic-config's config directory): the text size.
+    fn settings_store() -> Option<Config> {
+        Config::new(Self::APP_ID, 1).ok()
+    }
+
     /// The place the page shows, in saved form.
     fn place(&self) -> Option<Place> {
         let lib = self.library.as_ref()?;
         Some(match self.shelf[self.at.slot] {
-            Slot::Title => Place { book: String::new(), chapter: 0 },
+            Slot::Title => Place { book: String::new(), chapter: 0, verse: 0 },
             Slot::Book(i) => Place {
                 book: lib.bible.books[i].code.clone(),
                 chapter: lib.bible.books[i].chapters.get(self.at.page).map_or(0, |c| c.number),
+                verse: self.leaf().and_then(|leaf| leaf.first_verse).unwrap_or(0),
             },
         })
     }
@@ -448,11 +494,11 @@ impl Sojourner {
     }
 
     /// The saved place as a position on the shelf, if it still exists.
-    fn saved_position(&self) -> Option<Position> {
+    fn saved_position(&mut self) -> Option<Position> {
         let place: Place = Self::place_store()?.get("place").ok()?;
-        let lib = self.library.as_ref()?;
+        let lib = self.library.clone()?;
         if place.book.is_empty() {
-            return Some(Position { slot: 0, page: 0 });
+            return Some(Position { slot: 0, page: 0, leaf: 0 });
         }
         let (i, book) = lib.bible.books.iter().enumerate().find(|(_, b)| b.code == place.book)?;
         let slot = self.shelf.iter().position(|s| *s == Slot::Book(i))?;
@@ -461,7 +507,18 @@ impl Sojourner {
         } else {
             book.chapters.iter().position(|c| c.number == place.chapter)?
         };
-        Some(Position { slot, page })
+        let leaf = if place.verse == 0 { 0 } else { self.leaf_of_verse(slot, page, place.verse) };
+        Some(Position { slot, page, leaf })
+    }
+
+    /// What the header shows: the chapter on the page, or the app's name on
+    /// the title page.
+    fn heading(&self) -> String {
+        let Some(lib) = &self.library else { return "Sojourner".to_string() };
+        match self.shelf.get(self.at.slot) {
+            Some(Slot::Book(i)) => chapter_title(&lib.bible.books[*i], self.at.page),
+            _ => "Sojourner".to_string(),
+        }
     }
 
     /// The breadcrumb text for a stop.
@@ -535,12 +592,17 @@ impl Application for Sojourner {
 
     fn init(mut core: Core, _flags: Self::Flags) -> (Self, Task<Self::Message>) {
         core.window.header_title = "Sojourner".to_string();
+        let text_size = Self::settings_store()
+            .and_then(|store| store.get::<f32>("text_size").ok())
+            .map_or(DEFAULT_TEXT_SIZE, |size| size.clamp(SMALLEST_TEXT, LARGEST_TEXT));
         let mut app = Sojourner {
             core,
             library: None,
             error: None,
             shelf: Vec::new(),
-            at: Position { slot: 0, page: 0 },
+            at: Position { slot: 0, page: 0, leaf: 0 },
+            text_size,
+            leaves: HashMap::new(),
             contents_open: false,
             expanded: None,
             trail: Vec::new(),
@@ -557,21 +619,32 @@ impl Application for Sojourner {
     }
 
     /// Every message goes through `handle`; if it moved the page, the new
-    /// place is saved.
+    /// place is saved, and the header and window title follow the chapter.
     fn update(&mut self, message: Self::Message) -> Task<Self::Message> {
         let before = self.at;
         let task = self.handle(message);
         if self.at != before {
             self.remember_place();
         }
+        let heading = self.heading();
+        if heading != self.core.window.header_title {
+            self.core.window.header_title = heading.clone();
+            let title = self.set_window_title(if heading == "Sojourner" {
+                heading
+            } else {
+                format!("{heading} – Sojourner")
+            });
+            return Task::batch([task, title]);
+        }
         task
     }
 
-    /// Left/Right (and PageUp/PageDown) turn pages; Up/Down scroll the one
-    /// you're on; Space plays or pauses; Shift+Up/Down go back a verse or
-    /// skip one. Only key presses no widget claimed are considered, so
-    /// typing in a search box later won't turn pages. The second
-    /// subscription is the voice thread, which lives as long as the window.
+    /// Left/Right (and PageUp/PageDown) turn pages; Up/Down scroll a window
+    /// too small for the sheet; Space plays or pauses; Shift+Up/Down go back
+    /// a verse or skip one; Ctrl+plus/minus/0 change the text size. Only
+    /// key presses no widget claimed are considered, so typing in a search
+    /// box later won't turn pages. The second subscription is the voice
+    /// thread, which lives as long as the window.
     fn subscription(&self) -> Subscription<Self::Message> {
         let keys = iced::event::listen_with(|event, status, _window| {
             if status != iced::event::Status::Ignored {
@@ -583,6 +656,12 @@ impl Application for Sojourner {
             match key {
                 // The space bar arrives as the character it types.
                 keyboard::Key::Character(c) if c == " " => Some(Message::PlayPause),
+                keyboard::Key::Character(c) if modifiers.control() => match c.as_str() {
+                    "+" | "=" => Some(Message::TextSize(1.0)),
+                    "-" | "_" => Some(Message::TextSize(-1.0)),
+                    "0" => Some(Message::TextSize(0.0)),
+                    _ => None,
+                },
                 keyboard::Key::Named(key) => match key {
                     Named::ArrowRight | Named::PageDown => Some(Message::NextPage),
                     Named::ArrowLeft | Named::PageUp => Some(Message::PreviousPage),
@@ -599,25 +678,18 @@ impl Application for Sojourner {
         Subscription::batch([keys, Subscription::run(voice_thread)])
     }
 
-    /// The Contents toggle and Previous sit at the left of the header bar,
-    /// Next at the right, with the title between them, so the page itself
-    /// stays nothing but text.
+    /// The header stays quiet: the Contents toggle at the left, the reading
+    /// controls at the right, the chapter's name between them. Pages turn
+    /// from the arrows beside the sheet and the keys.
     fn header_start(&self) -> Vec<Element<'_, Self::Message>> {
         if self.library.is_none() {
             return Vec::new();
         }
-        vec![
-            row![
-                button::icon(icon::from_name("open-menu-symbolic")).on_press(Message::ToggleContents),
-                button::standard("‹ Previous").on_press(Message::PreviousPage),
-            ]
-            .spacing(8)
-            .into(),
-        ]
+        vec![button::icon(icon::from_name("open-menu-symbolic")).on_press(Message::ToggleContents).into()]
     }
 
-    /// The reading controls and Next sit at the right. Play shows on any
-    /// chapter page; the rest only while something is being read.
+    /// The reading controls. Play shows on any chapter page; the rest only
+    /// while something is being read.
     fn header_end(&self) -> Vec<Element<'_, Self::Message>> {
         let Some(lib) = &self.library else {
             return Vec::new();
@@ -637,12 +709,7 @@ impl Application for Sojourner {
         } else if on_chapter {
             controls = controls.push(button::icon(icon::from_name("media-playback-start-symbolic")).on_press(Message::PlayPause));
         }
-        vec![
-            row![controls, button::standard("Next ›").on_press(Message::NextPage)]
-                .spacing(8)
-                .align_y(iced::Alignment::Center)
-                .into(),
-        ]
+        vec![controls.into()]
     }
 
     /// The right-hand drawer carries the trail, and nothing else.
@@ -655,7 +722,7 @@ impl Application for Sojourner {
     }
 
     fn view(&self) -> Element<'_, Self::Message> {
-        let Some(lib) = &self.library else {
+        if self.library.is_none() {
             let notice = match &self.error {
                 Some(error) => format!("Couldn't open the text: {error}"),
                 None => "Opening the World English Bible…".to_string(),
@@ -666,30 +733,12 @@ impl Application for Sojourner {
                 .center_x(Length::Fill)
                 .center_y(Length::Fill)
                 .into();
-        };
+        }
 
         let palette = Palette::current();
-        let page: Element<'_, Message> = match self.shelf[self.at.slot] {
-            Slot::Title => {
-                let title = title_page(&palette);
-                return if self.contents_open {
-                    row![self.contents(), divider::vertical::light(), title]
-                        .width(Length::Fill)
-                        .height(Length::Fill)
-                        .into()
-                } else {
-                    title
-                };
-            }
-            Slot::Book(i) => book_page(&lib.bible.books[i], i as u8, self.at.page, self.spoken_on_page(), &palette),
-        };
-
-        // The measure cap plus centering is what turns a window into a page:
-        // widen the window and the margins grow, not the line length.
-        let sheet = container(page).max_width(MEASURE).padding([24, 32]);
         let mut page_area = column![].width(Length::Fill).height(Length::Fill);
         if let Some(notice) = &self.voice_notice {
-            // A word about the voice, above the page, only while there is
+            // A word about the voice, above the desk, only while there is
             // something to say.
             page_area = page_area.push(
                 container(text(notice.as_str()).size(13).class(palette.muted))
@@ -698,12 +747,9 @@ impl Application for Sojourner {
                     .padding([6, 0, 0, 0]),
             );
         }
-        let page_area = page_area.push(
-            container(scrollable(sheet).id(page_scroll_id()))
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .center_x(Length::Fill),
-        );
+        // The desk lays the sheet out for the room it has: centered when the
+        // window shows it whole, scrolling when it doesn't.
+        let page_area = page_area.push(responsive(move |size| self.desk(size)));
 
         if self.contents_open {
             row![self.contents(), divider::vertical::light(), page_area]
@@ -723,10 +769,11 @@ impl Sojourner {
                 self.shelf = shelf_order(&library);
                 self.library = Some(library);
                 // Open where the reader left off, if that place still exists.
-                self.at = self.saved_position().unwrap_or(Position { slot: 0, page: 0 });
+                self.at = self.saved_position().unwrap_or(Position { slot: 0, page: 0, leaf: 0 });
                 if self.at.slot != 0 {
                     self.expanded = Some(self.at.slot);
                 }
+                self.leaves_of(self.at.slot, self.at.page);
                 Task::none()
             }
             Message::Loaded(Err(error)) => {
@@ -735,13 +782,40 @@ impl Sojourner {
             }
             Message::NextPage => {
                 self.turn(true);
+                self.leaves_of(self.at.slot, self.at.page);
                 Self::back_to_top()
             }
             Message::PreviousPage => {
                 self.turn(false);
+                self.leaves_of(self.at.slot, self.at.page);
                 Self::back_to_top()
             }
             Message::ScrollPage(by) => scroll_by(page_scroll_id(), AbsoluteOffset { x: 0.0, y: by }),
+            Message::TextSize(delta) => {
+                let size = if delta == 0.0 {
+                    DEFAULT_TEXT_SIZE
+                } else {
+                    (self.text_size + delta).clamp(SMALLEST_TEXT, LARGEST_TEXT)
+                };
+                if size == self.text_size {
+                    return Task::none();
+                }
+                // Every sheet is set afresh at the new size; the page stays
+                // on the verse it was showing.
+                let verse = self.leaf().and_then(|leaf| leaf.first_verse);
+                self.text_size = size;
+                self.leaves.clear();
+                self.at.leaf = match verse {
+                    Some(v) => self.leaf_of_verse(self.at.slot, self.at.page, v),
+                    None => 0,
+                };
+                if let Some(store) = Self::settings_store() {
+                    if let Err(e) = store.set("text_size", size) {
+                        eprintln!("couldn't save the text size: {e}");
+                    }
+                }
+                Self::back_to_top()
+            }
             Message::ToggleContents => {
                 self.contents_open = !self.contents_open;
                 if self.contents_open {
@@ -767,6 +841,7 @@ impl Sojourner {
                 // The sidebar stays open: turning through chapters from it
                 // is what it is for.
                 self.at = position;
+                self.leaves_of(self.at.slot, self.at.page);
                 Self::back_to_top()
             }
             Message::Follow(link) => {
@@ -808,13 +883,14 @@ impl Sojourner {
                         Task::none()
                     }
                     _ => {
-                        // Nothing is being read: read the chapter on the page,
-                        // from its first verse.
+                        // Nothing is being read: read the chapter on the page
+                        // from the first verse that begins on this sheet.
                         let Slot::Book(i) = self.shelf[self.at.slot] else { return Task::none() };
                         let Some(lib) = &self.library else { return Task::none() };
                         let Some(chapter) = lib.bible.books[i].chapters.get(self.at.page) else { return Task::none() };
-                        let first = VerseRef { book: i as u8, chapter: chapter.number, verse: 1 };
-                        self.start_reading(first);
+                        let verse = self.leaf().and_then(Leaf::first_numbered).unwrap_or(1).max(1);
+                        let from = VerseRef { book: i as u8, chapter: chapter.number, verse };
+                        self.start_reading(from);
                         Task::none()
                     }
                 }
@@ -896,8 +972,150 @@ impl Sojourner {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// Pages
+// The desk and the sheet
 // ────────────────────────────────────────────────────────────────────────────
+
+impl Sojourner {
+    /// The sheet on the desk with the page-turn arrows beside it. Given the
+    /// room the window has: when the whole spread fits, it is centered;
+    /// when it doesn't, it scrolls — down when only the height is short,
+    /// both ways when the width is too.
+    fn desk(&self, room: Size) -> Element<'_, Message> {
+        let at_front = self.at == Position { slot: 0, page: 0, leaf: 0 };
+        let at_back = {
+            let last = self.shelf.len().saturating_sub(1);
+            self.at.slot == last
+                && self.at.page + 1 >= self.pages(last)
+                && self.leaves.get(&(self.at.slot, self.at.page)).is_none_or(|l| self.at.leaf + 1 >= l.len())
+        };
+        let previous = button::icon(icon::from_name("go-previous-symbolic"))
+            .medium()
+            .on_press_maybe((!at_front).then_some(Message::PreviousPage));
+        let next = button::icon(icon::from_name("go-next-symbolic"))
+            .medium()
+            .on_press_maybe((!at_back).then_some(Message::NextPage));
+        // The arrows go when there is no room beside the sheet for them
+        // (the Contents sidebar open in a narrow window); the keys still
+        // turn the pages.
+        let spread_width = SHEET_WIDTH + 2.0 * (ARROW_WIDTH + DESK_AIR);
+        let with_arrows = room.width >= spread_width + DESK_AIR;
+        let spread = if with_arrows {
+            row![
+                container(previous).width(ARROW_WIDTH).center_x(ARROW_WIDTH),
+                self.sheet(),
+                container(next).width(ARROW_WIDTH).center_x(ARROW_WIDTH),
+            ]
+            .spacing(DESK_AIR)
+            .align_y(iced::Alignment::Center)
+        } else {
+            row![self.sheet()]
+        };
+
+        let fits_across = room.width >= (if with_arrows { spread_width } else { SHEET_WIDTH }) + DESK_AIR;
+        let fits_down = room.height >= SHEET_HEIGHT + DESK_AIR;
+        if fits_across && fits_down {
+            return container(spread)
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .center_x(Length::Fill)
+                .center_y(Length::Fill)
+                .into();
+        }
+        let bar = || Scrollbar::new().width(8.0).scroller_width(8.0);
+        let padded = container(spread).padding(DESK_AIR);
+        if fits_across {
+            scrollable(container(padded).width(Length::Fill).center_x(Length::Fill))
+                .id(page_scroll_id())
+                .direction(Direction::Vertical(bar()))
+                .into()
+        } else {
+            scrollable(padded)
+                .id(page_scroll_id())
+                .direction(Direction::Both { vertical: bar(), horizontal: bar() })
+                .into()
+        }
+    }
+
+    /// One sheet of paper: the running head in the top margin, the text
+    /// area, the folio in the bottom margin. On the title page, just the
+    /// title.
+    fn sheet(&self) -> Element<'_, Message> {
+        let palette = Palette::current();
+        let paper = paper_style(&palette);
+        let Some(lib) = &self.library else { return space::horizontal().into() };
+
+        let Slot::Book(i) = self.shelf[self.at.slot] else {
+            return container(title_page(&palette))
+                .width(SHEET_WIDTH)
+                .height(SHEET_HEIGHT)
+                .padding([MARGIN_Y, MARGIN_X])
+                .class(paper)
+                .into();
+        };
+        let book = &lib.bible.books[i];
+        let leaves = self.leaves.get(&(self.at.slot, self.at.page));
+        let leaf = leaves.and_then(|l| l.get(self.at.leaf));
+
+        // The running head: the chapter at the left, the verses on this
+        // sheet at the right, the way a printed Bible does it.
+        let head_left = chapter_title(book, self.at.page);
+        let head_right = match leaf.and_then(|l| l.first_verse.zip(l.last_verse)) {
+            Some((first, last)) if first == last => first.to_string(),
+            Some((first, last)) => format!("{first}–{last}"),
+            None => String::new(),
+        };
+        let head = row![
+            text(head_left).size(12).font(SERIF_ITALIC).class(palette.page_muted),
+            space::horizontal(),
+            text(head_right).size(12).font(SERIF_ITALIC).class(palette.page_muted),
+        ]
+        .height(MARGIN_Y)
+        .align_y(iced::Alignment::Center);
+
+        // The text area: the sheet's paragraphs, the first with no air above
+        // it so every page starts at the same line.
+        let spoken = self.spoken_on_page();
+        let mut body = column![].spacing(0).width(TEXT_WIDTH);
+        if let Some(leaf) = leaf {
+            for (n, par) in leaf.pars.iter().enumerate() {
+                body = body.push(par_element(par, self.text_size, &palette, spoken, n == 0));
+            }
+        }
+        let area = container(body).width(TEXT_WIDTH).height(TEXT_HEIGHT).clip(true);
+
+        // The folio: which sheet of the chapter this is.
+        let folio = match leaves.map(Vec::len) {
+            Some(count) if count > 1 => format!("{} of {count}", self.at.leaf + 1),
+            _ => String::new(),
+        };
+        let foot = container(text(folio).size(12).font(SERIF).class(palette.page_muted))
+            .width(Length::Fill)
+            .height(MARGIN_Y)
+            .center_x(Length::Fill)
+            .center_y(MARGIN_Y);
+
+        container(column![head, area, foot].width(TEXT_WIDTH))
+            .width(SHEET_WIDTH)
+            .height(SHEET_HEIGHT)
+            .padding([0.0, MARGIN_X])
+            .class(paper)
+            .into()
+    }
+}
+
+/// The look of the paper: its colour, the ink on it, a soft shadow on the
+/// desk. Set on the sheet's container, so everything on the sheet inherits
+/// the ink.
+fn paper_style(palette: &Palette) -> cosmic::theme::Container<'static> {
+    let (paper, ink, shadow) = (palette.paper, palette.ink, palette.shadow);
+    cosmic::theme::Container::custom(move |_theme| iced::widget::container::Style {
+        text_color: Some(ink),
+        background: Some(iced::Background::Color(paper)),
+        border: Border { color: Color::TRANSPARENT, width: 0.0, radius: 2.0.into() },
+        shadow: Shadow { color: shadow, offset: Vector::new(0.0, 3.0), blur_radius: 16.0 },
+        ..Default::default()
+    })
+}
 
 /// Sojourner's own first page. Everything on it is either the app's name or
 /// a fact recorded in assets/SOURCES.md.
@@ -911,10 +1129,10 @@ fn title_page<'a>(palette: &Palette) -> Element<'a, Message> {
         space::vertical().height(6),
         text("World English Bible").size(18).font(SERIF),
         space::vertical().height(28),
-        text("Updated edition · Public domain · eBible.org").size(13).class(palette.muted),
-        text("Cross-references from openbible.info, CC BY 4.0").size(13).class(palette.muted),
+        text("Updated edition · Public domain · eBible.org").size(13).class(palette.page_muted),
+        text("Cross-references from openbible.info, CC BY 4.0").size(13).class(palette.page_muted),
         space::vertical().height(40),
-        text("Turn the page with → or Next").size(13).class(palette.muted),
+        text("Turn the page with → or the arrow beside it").size(13).class(palette.page_muted),
     ]
     .align_x(iced::Alignment::Center)
     .spacing(0);
@@ -927,46 +1145,53 @@ fn title_page<'a>(palette: &Palette) -> Element<'a, Message> {
         .into()
 }
 
-/// One page of a publisher's file: a chapter of scripture, or the whole of
-/// a chapterless file (the preface, the glossary).
-fn book_page<'a>(book: &'a Book, book_ix: u8, page: usize, spoken: Option<u32>, palette: &Palette) -> Element<'a, Message> {
-    let mut sheet = column![].spacing(0);
+// ────────────────────────────────────────────────────────────────────────────
+// Drawing the sheet
+// ────────────────────────────────────────────────────────────────────────────
 
-    // The lead-in lines ("The First Book of Moses," / "Commonly Called")
-    // are set small and italic; the name itself ("Genesis") upright and
-    // large, the way a printed Bible does it.
-    if page == 0 && !book.names.title_lines.is_empty() {
-        for (i, line) in book.names.title_lines.iter().enumerate() {
-            let last = i + 1 == book.names.title_lines.len();
-            sheet = sheet.push(if last {
-                text(line.as_str()).size(34).font(SERIF)
-            } else {
-                text(line.as_str()).size(16).font(SERIF_ITALIC).class(palette.muted)
-            });
-        }
-        sheet = sheet.push(space::vertical().height(if book.chapters.is_empty() { 18 } else { 26 }));
+/// A paragraph drawn: its pieces as spans, with the colours and links the
+/// measurer left out, the verse being read aloud highlighted.
+fn par_view<'a>(par: &Par, g: &Geometry, palette: &Palette, spoken: Option<u32>) -> Rich<'a, PageLink, Message, cosmic::Theme, cosmic::Renderer> {
+    let spans: Vec<Span<'a, PageLink, Font>> = par
+        .pieces
+        .iter()
+        .map(|piece| {
+            let mut s = shaped_span(piece.text.clone(), piece, g);
+            match piece.ink {
+                Ink::Body => {}
+                Ink::Muted => s = s.color(palette.page_muted),
+                Ink::Red => s = s.color(palette.red_letter),
+                Ink::Accent => s = s.color(palette.accent),
+            }
+            if let Some(link) = piece.link {
+                s = s.link(link);
+            }
+            if spoken.is_some() && piece.verse == spoken {
+                s = s.background(palette.spoken);
+            }
+            s
+        })
+        .collect();
+    rich_text(spans)
+        .size(g.size)
+        .line_height(LineHeight::Absolute(Pixels(g.line)))
+        .font(g.font)
+        .align_x(g.align)
+        .width(Length::Fill)
+        .on_link_click(Message::Follow)
+}
+
+/// A paragraph on the sheet, with its air and indent. The first on a sheet
+/// gets no air above it.
+fn par_element<'a>(par: &Par, body: f32, palette: &Palette, spoken: Option<u32>, first: bool) -> Element<'a, Message> {
+    let g = geometry(par.shape, body);
+    let above = if first { 0.0 } else { g.above };
+    if is_air(par) {
+        return space::vertical().height(above).into();
     }
-
-    let (blocks, cursor): (&[Block], Option<LinkCursor>) = if book.chapters.is_empty() {
-        (&book.intro, None)
-    } else {
-        let chapter = &book.chapters[page];
-        // "John 3", or "Psalm 23" where the publisher gave a chapter label.
-        let label = book.chapter_label.as_deref().unwrap_or(&book.names.short);
-        let number = chapter
-            .published_number
-            .clone()
-            .unwrap_or_else(|| chapter.number.to_string());
-        sheet = sheet.push(text(format!("{label} {number}")).size(30).font(SERIF));
-        sheet = sheet.push(space::vertical().height(14));
-        (&chapter.blocks, Some(LinkCursor::new(book_ix, chapter.number).speaking(spoken)))
-    };
-
-    let mut cursor = cursor;
-    for block in blocks {
-        sheet = sheet.push(render_block(block, palette, BODY, LINE, cursor.as_mut()));
-    }
-    sheet.into()
+    container(par_view(par, &g, palette, spoken))
+        .padding([above, 0.0, g.below, g.indent])
+        .into()
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -994,7 +1219,7 @@ impl Sojourner {
                 Slot::Title => {
                     list = list.push(
                         button::text(if here { "▸ Title page" } else { "Title page" })
-                            .on_press(Message::GoTo(Position { slot: slot_ix, page: 0 })),
+                            .on_press(Message::GoTo(Position { slot: slot_ix, page: 0, leaf: 0 })),
                     );
                 }
                 Slot::Book(i) => {
@@ -1012,7 +1237,7 @@ impl Sojourner {
                     if book.chapters.is_empty() {
                         // Preface and glossary: one page, no chapters to unfold.
                         list = list.push(
-                            button::text(name).on_press(Message::GoTo(Position { slot: slot_ix, page: 0 })),
+                            button::text(name).on_press(Message::GoTo(Position { slot: slot_ix, page: 0, leaf: 0 })),
                         );
                     } else {
                         list = list.push(button::text(name).on_press(Message::ExpandBook(slot_ix)));
@@ -1023,7 +1248,7 @@ impl Sojourner {
                                 .enumerate()
                                 .map(|(page, chapter)| {
                                     let label = chapter.number.to_string();
-                                    let go = Message::GoTo(Position { slot: slot_ix, page });
+                                    let go = Message::GoTo(Position { slot: slot_ix, page, leaf: 0 });
                                     // The chapter being read is the one filled-in button.
                                     if here && page == self.at.page {
                                         button::suggested(label).on_press(go).into()
@@ -1093,7 +1318,7 @@ impl Sojourner {
         let mut body = column![].spacing(8);
 
         // The verse text, block structure kept, with its own footnotes and
-        // markers clickable.
+        // markers clickable. Set the way the page sets it, a little smaller.
         let mut shown_marker: Option<u32> = None;
         for v in lib.index.between(start, end) {
             let Some(found) = scripture::verse(&lib.bible, *v) else { continue };
@@ -1102,9 +1327,12 @@ impl Sojourner {
                 continue;
             }
             shown_marker = Some(found.number.start);
-            let mut cursor = LinkCursor::new(v.book, v.chapter);
+            let mut setter = Setter::new(v.book, v.chapter);
             for (kind, inlines) in &found.pieces {
-                body = body.push(render_content(*kind, inlines, palette, PANEL_BODY, PANEL_LINE, Some(&mut cursor)));
+                let shape = Shape::Block(*kind);
+                let par = set_content(shape, inlines, kind.is_verse_flow().then_some(&mut setter));
+                let g = geometry(shape, PANEL_BODY);
+                body = body.push(container(par_view(&par, &g, palette, None)).padding([g.above, 0.0, g.below, g.indent]));
             }
         }
 
@@ -1231,253 +1459,6 @@ fn quote_of(lib: &Library, start: VerseRef, end: VerseRef) -> String {
     }
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// Rendering the block model
-// ────────────────────────────────────────────────────────────────────────────
-
-/// The few colours the page uses, taken from the active COSMIC theme so the
-/// page follows light and dark mode.
-struct Palette {
-    /// Verse numbers and note markers.
-    accent: Color,
-    /// Superscriptions, speaker labels, small print: present but quieter.
-    muted: Color,
-    /// Words of Jesus.
-    red_letter: Color,
-    /// Behind the verse being read aloud: the accent, faint.
-    spoken: Color,
-}
-
-impl Palette {
-    fn current() -> Self {
-        let theme = cosmic::theme::active();
-        let cosmic = theme.cosmic();
-        let accent: Color = cosmic.accent_color().into();
-        Palette {
-            accent,
-            muted: cosmic.palette.neutral_7.into(),
-            red_letter: Color::from_rgb(0.72, 0.16, 0.16),
-            spoken: Color { a: 0.22, ..accent },
-        }
-    }
-}
-
-/// Which verse the renderer is inside, as it walks a chapter's blocks, so
-/// each verse number, footnote marker and cross-reference marker can carry
-/// the right link. Footnotes are numbered within their verse, in order.
-struct LinkCursor {
-    book: u8,
-    chapter: u32,
-    current: Option<VerseRef>,
-    notes: usize,
-    xrefs: usize,
-    /// The verse being read aloud on this page, if any: its words are
-    /// highlighted as the renderer passes through it.
-    speaking: Option<u32>,
-}
-
-impl LinkCursor {
-    fn new(book: u8, chapter: u32) -> Self {
-        LinkCursor { book, chapter, current: None, notes: 0, xrefs: 0, speaking: None }
-    }
-
-    fn speaking(mut self, verse: Option<u32>) -> Self {
-        self.speaking = verse;
-        self
-    }
-
-    /// Is the renderer inside the verse being read aloud?
-    fn in_spoken(&self) -> bool {
-        self.speaking.is_some() && self.current.map(|v| v.verse) == self.speaking
-    }
-}
-
-/// One block of a page, as a widget.
-fn render_block<'a>(
-    block: &'a Block,
-    palette: &Palette,
-    size: f32,
-    line: LineHeight,
-    cursor: Option<&mut LinkCursor>,
-) -> Element<'a, Message> {
-    // Links only make sense in the verse flow: a footnote in a superscription
-    // belongs to no verse.
-    let cursor = if block.kind.is_verse_flow() { cursor } else { None };
-    render_content(block.kind, &block.content, palette, size, line, cursor)
-}
-
-/// A run of inlines laid out as a block of the given kind.
-fn render_content<'a>(
-    kind: BlockKind,
-    content: &'a [Inline],
-    palette: &Palette,
-    size: f32,
-    line: LineHeight,
-    cursor: Option<&mut LinkCursor>,
-) -> Element<'a, Message> {
-    let text_of = |font: Font, cursor: Option<&mut LinkCursor>| flow(content, palette, font, size, line, cursor);
-
-    match kind {
-        // A stanza break: just air.
-        BlockKind::Blank => space::vertical().height(12).into(),
-
-        // Prose. Paragraph spacing above; the text wraps to the measure.
-        BlockKind::Paragraph | BlockKind::NoBreak | BlockKind::IntroParagraph => {
-            container(text_of(SERIF, cursor)).padding([8, 0, 0, 0]).into()
-        }
-        BlockKind::Flush | BlockKind::IndentedFlush => container(text_of(SERIF, cursor)).padding([4, 0, 0, 0]).into(),
-        BlockKind::Indented | BlockKind::ListItem | BlockKind::IntroListItem => {
-            container(text_of(SERIF, cursor)).padding([4, 0, 0, 24]).into()
-        }
-        BlockKind::Centered => container(text_of(SERIF, cursor).center())
-            .width(Length::Fill)
-            .padding([8, 0, 0, 0])
-            .into(),
-
-        // Poetry: one line per block, hanging indent by level, no paragraph
-        // spacing so the lines read as verse.
-        BlockKind::Poetry(level) => {
-            let indent = 16 + 24 * (u16::from(level).saturating_sub(1));
-            container(text_of(SERIF, cursor)).padding([0, 0, 0, indent]).into()
-        }
-
-        // A Psalm's superscription: scripture, set quietly in italic.
-        BlockKind::Superscription => container(text_of(SERIF_ITALIC, cursor).class(palette.muted))
-            .padding([6, 0, 10, 0])
-            .into(),
-
-        // Speaker labels (Song of Songs), section headings.
-        BlockKind::Speaker => container(text_of(SERIF_ITALIC, cursor).class(palette.muted))
-            .padding([10, 0, 2, 0])
-            .into(),
-        BlockKind::Heading | BlockKind::IntroHeading => container(text_of(SERIF_BOLD, cursor)).padding([14, 0, 4, 0]).into(),
-        BlockKind::MajorHeading => container(text_of(SERIF_BOLD, cursor).size(size + 4.0))
-            .padding([18, 0, 6, 0])
-            .into(),
-    }
-}
-
-/// A block's inlines as one wrapped run of rich text: small accent-coloured
-/// verse numbers set into the words, footnote and cross-reference markers
-/// where the publisher anchored them, words of Jesus in red. With a cursor,
-/// the numbers and markers are links.
-fn flow<'a>(
-    content: &'a [Inline],
-    palette: &Palette,
-    font: Font,
-    size: f32,
-    line: LineHeight,
-    mut cursor: Option<&mut LinkCursor>,
-) -> Rich<'a, PageLink, Message, cosmic::Theme, cosmic::Renderer> {
-    let mut spans: Vec<Span<'a, PageLink, Font>> = Vec::with_capacity(content.len() * 2);
-
-    for inline in content {
-        match inline {
-            Inline::Verse(n) => {
-                let label = if n.end > n.start {
-                    format!("{}-{}", n.start, n.end)
-                } else {
-                    n.start.to_string()
-                };
-                let mut s = span(label).size(VERSE_NUMBER).color(palette.accent).font(Font::DEFAULT);
-                if let Some(c) = cursor.as_deref_mut() {
-                    let verse = VerseRef { book: c.book, chapter: c.chapter, verse: n.start };
-                    c.current = Some(verse);
-                    c.notes = 0;
-                    c.xrefs = 0;
-                    s = s.link(PageLink::Verse(verse));
-                    if c.in_spoken() {
-                        s = s.background(palette.spoken);
-                    }
-                }
-                spans.push(s);
-                spans.push(span("\u{2009}")); // a thin space between number and word
-            }
-            Inline::Text(run) => {
-                let run_font = match run.style {
-                    TextStyle::Selah | TextStyle::Hebrew | TextStyle::NoteQuote | TextStyle::NoteAlternate => SERIF_ITALIC,
-                    TextStyle::Keyword => Font::DEFAULT,
-                    _ => font,
-                };
-                let spoken = cursor.as_deref().is_some_and(LinkCursor::in_spoken);
-                // The divine name is set in capitals in the text ("LORD",
-                // "GOD"); a printed Bible sets it in small capitals. Rich
-                // text has no small-caps face, so the word's first letter
-                // keeps the body size and the rest are set smaller.
-                for (piece, small) in small_capitals(&run.text) {
-                    let mut s = span(piece).font(run_font);
-                    if small {
-                        s = s.size(size * SMALL_CAPS);
-                    }
-                    if run.style == TextStyle::WordsOfJesus {
-                        s = s.color(palette.red_letter);
-                    }
-                    if spoken {
-                        s = s.background(palette.spoken);
-                    }
-                    spans.push(s);
-                }
-            }
-            Inline::Footnote(_) => {
-                let mut s = span("†").size(VERSE_NUMBER).color(palette.accent).font(Font::DEFAULT);
-                if let Some(c) = cursor.as_deref_mut() {
-                    if let Some(verse) = c.current {
-                        s = s.link(PageLink::Note(verse, c.notes));
-                        c.notes += 1;
-                    }
-                }
-                spans.push(s);
-            }
-            Inline::CrossRef(_) => {
-                let mut s = span("‡").size(VERSE_NUMBER).color(palette.accent).font(Font::DEFAULT);
-                if let Some(c) = cursor.as_deref_mut() {
-                    if let Some(verse) = c.current {
-                        s = s.link(PageLink::Xref(verse, c.xrefs));
-                        c.xrefs += 1;
-                    }
-                }
-                spans.push(s);
-            }
-        }
-    }
-
-    rich_text(spans)
-        .size(size)
-        .line_height(line)
-        .font(font)
-        .on_link_click(Message::Follow)
-}
-
-/// Small capitals, faked: a word set in capitals ("LORD", "GOD") is split
-/// into its first letter, kept at body size, and the rest, set at
-/// `SMALL_CAPS` of it — "L" + "ORD". Everything else passes through whole.
-/// The pieces are slices of the run, in order; the flag says which are the
-/// small ones.
-fn small_capitals(text: &str) -> Vec<(&str, bool)> {
-    let mut pieces = Vec::new();
-    let mut start = 0;
-    let mut i = 0;
-    while i < text.len() {
-        // A run of letters.
-        let word_end = text[i..].find(|c: char| !c.is_alphabetic()).map_or(text.len(), |n| i + n);
-        if word_end > i && word_end - i >= 2 && text[i..word_end].chars().all(char::is_uppercase) {
-            let first = text[i..].chars().next().unwrap().len_utf8();
-            if i > start {
-                pieces.push((&text[start..i], false));
-            }
-            pieces.push((&text[i..i + first], false));
-            pieces.push((&text[i + first..word_end], true));
-            start = word_end;
-        }
-        // Skip past this word (or this one non-letter character).
-        i = if word_end > i { word_end } else { i + text[i..].chars().next().map_or(1, char::len_utf8) };
-    }
-    if start < text.len() {
-        pieces.push((&text[start..], false));
-    }
-    pieces
-}
-
 /// A footnote's runs as rich text: `\fq` and `\fqa` in italic, Hebrew words
 /// as they are.
 fn note_flow<'a>(note: &'a Footnote, _palette: &Palette) -> Rich<'a, PageLink, Message, cosmic::Theme, cosmic::Renderer> {
@@ -1499,6 +1480,67 @@ fn note_flow<'a>(note: &'a Footnote, _palette: &Palette) -> Rich<'a, PageLink, M
         .on_link_click(Message::Follow)
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// Colours
+// ────────────────────────────────────────────────────────────────────────────
+
+/// The few colours the window uses. The paper and its ink are Sojourner's
+/// own, a warm cream by day and a warm dark by night, chosen by whether the
+/// COSMIC theme is light or dark; the rest come from the theme so links
+/// and the panel follow it.
+struct Palette {
+    /// Verse numbers and note markers.
+    accent: Color,
+    /// Quiet text off the sheet (the panel, the sidebar).
+    muted: Color,
+    /// The sheet.
+    paper: Color,
+    /// Text on the sheet.
+    ink: Color,
+    /// Quiet text on the sheet: superscriptions, the running head.
+    page_muted: Color,
+    /// The sheet's shadow on the desk.
+    shadow: Color,
+    /// Words of Jesus.
+    red_letter: Color,
+    /// Behind the verse being read aloud: the accent, faint.
+    spoken: Color,
+}
+
+impl Palette {
+    fn current() -> Self {
+        let theme = cosmic::theme::active();
+        let cosmic = theme.cosmic();
+        let accent: Color = cosmic.accent_color().into();
+        let dark = cosmic.is_dark;
+        let (paper, ink, red_letter, shadow) = if dark {
+            (
+                Color::from_rgb8(0x26, 0x23, 0x20),
+                Color::from_rgb8(0xDC, 0xD6, 0xC8),
+                Color::from_rgb8(0xD9, 0x6A, 0x62),
+                Color { a: 0.5, ..Color::BLACK },
+            )
+        } else {
+            (
+                Color::from_rgb8(0xFA, 0xF6, 0xEE),
+                Color::from_rgb8(0x2B, 0x26, 0x20),
+                Color::from_rgb8(0xB4, 0x2A, 0x2A),
+                Color { a: 0.22, ..Color::BLACK },
+            )
+        };
+        Palette {
+            accent,
+            muted: cosmic.palette.neutral_7.into(),
+            paper,
+            ink,
+            page_muted: Color { a: 0.6, ..ink },
+            shadow,
+            red_letter,
+            spoken: Color { a: 0.22, ..accent },
+        }
+    }
+}
+
 /// The voice thread, as a subscription: started once, alive as long as the
 /// window. The first thing out of it is the handle the window sends commands
 /// with; everything after is what the voice reports back.
@@ -1517,8 +1559,11 @@ fn voice_thread() -> impl Stream<Item = Message> {
 }
 
 fn main() -> cosmic::iced::Result {
-    // A portrait, book-shaped window to start in. Resizing still works; the
-    // fixed-page mode that locks this down is a later step.
-    let settings = cosmic::app::Settings::default().size(Size::new(760.0, 920.0));
+    // A window that shows one sheet whole, with the arrows beside it and a
+    // little desk around: the header bar is above. Resizing is allowed; a
+    // smaller window scrolls the sheet, a larger one gets more desk.
+    let width = SHEET_WIDTH + 2.0 * (ARROW_WIDTH + DESK_AIR) + 3.0 * DESK_AIR;
+    let height = SHEET_HEIGHT + 3.0 * DESK_AIR + 48.0;
+    let settings = cosmic::app::Settings::default().size(Size::new(width, height));
     cosmic::app::run::<Sojourner>(settings, ())
 }

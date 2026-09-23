@@ -133,8 +133,9 @@ pub struct Sojourner {
 }
 
 /// Where the reader left off, as it is saved: the publisher's book code
-/// ("JHN"), the chapter number and the first verse on the sheet, or an
-/// empty code for the title page. Codes and numbers rather than positions,
+/// ("JHN"), the chapter number and the first verse that begins on the
+/// sheet (so the book reopens on that very sheet), or an empty code for
+/// the title page. Codes and numbers rather than positions,
 /// so the place survives a change of edition, shelf order or text size.
 /// (Places saved before there were verses have none; that reads as 0, the
 /// start of the chapter.)
@@ -478,7 +479,7 @@ impl Sojourner {
             Slot::Book(i) => Place {
                 book: lib.bible.books[i].code.clone(),
                 chapter: lib.bible.books[i].chapters.get(self.at.page).map_or(0, |c| c.number),
-                verse: self.leaf().and_then(|leaf| leaf.first_verse).unwrap_or(0),
+                verse: self.leaf().and_then(|leaf| leaf.first_numbered().or(leaf.first_verse)).unwrap_or(0),
             },
         })
     }
@@ -748,16 +749,19 @@ impl Application for Sojourner {
             );
         }
         // The desk lays the sheet out for the room it has: centered when the
-        // window shows it whole, scrolling when it doesn't.
+        // window shows it whole, scrolling when it doesn't. Its colour is
+        // Sojourner's own, like the paper's, so the book looks the same on
+        // every desktop theme.
         let page_area = page_area.push(responsive(move |size| self.desk(size)));
+        let desk = container(page_area).width(Length::Fill).height(Length::Fill).class(desk_style(&palette));
 
         if self.contents_open {
-            row![self.contents(), divider::vertical::light(), page_area]
+            row![self.contents(), divider::vertical::light(), desk]
                 .width(Length::Fill)
                 .height(Length::Fill)
                 .into()
         } else {
-            page_area.into()
+            desk.into()
         }
     }
 }
@@ -802,7 +806,7 @@ impl Sojourner {
                 }
                 // Every sheet is set afresh at the new size; the page stays
                 // on the verse it was showing.
-                let verse = self.leaf().and_then(|leaf| leaf.first_verse);
+                let verse = self.leaf().and_then(|leaf| leaf.first_numbered().or(leaf.first_verse));
                 self.text_size = size;
                 self.leaves.clear();
                 self.at.leaf = match verse {
@@ -1101,6 +1105,15 @@ impl Sojourner {
             .class(paper)
             .into()
     }
+}
+
+/// The desk: a plain surface under the sheet, in Sojourner's own colour.
+fn desk_style(palette: &Palette) -> cosmic::theme::Container<'static> {
+    let desk = palette.desk;
+    cosmic::theme::Container::custom(move |_theme| iced::widget::container::Style {
+        background: Some(iced::Background::Color(desk)),
+        ..Default::default()
+    })
 }
 
 /// The look of the paper: its colour, the ink on it, a soft shadow on the
@@ -1484,15 +1497,18 @@ fn note_flow<'a>(note: &'a Footnote, _palette: &Palette) -> Rich<'a, PageLink, M
 // Colours
 // ────────────────────────────────────────────────────────────────────────────
 
-/// The few colours the window uses. The paper and its ink are Sojourner's
-/// own, a warm cream by day and a warm dark by night, chosen by whether the
-/// COSMIC theme is light or dark; the rest come from the theme so links
-/// and the panel follow it.
+/// The few colours the window uses. The book's are Sojourner's own — the
+/// desk, the paper, its ink, the links on it — a warm cream by day and a
+/// warm dark by night, chosen by whether the COSMIC theme is light or dark
+/// and otherwise the same on every desktop; only the chrome around the book
+/// (the panel, the sidebar, the header) follows the theme.
 struct Palette {
-    /// Verse numbers and note markers.
+    /// Verse numbers and note markers: the links on the sheet.
     accent: Color,
     /// Quiet text off the sheet (the panel, the sidebar).
     muted: Color,
+    /// The desk the sheet lies on.
+    desk: Color,
     /// The sheet.
     paper: Color,
     /// Text on the sheet.
@@ -1511,19 +1527,25 @@ impl Palette {
     fn current() -> Self {
         let theme = cosmic::theme::active();
         let cosmic = theme.cosmic();
-        let accent: Color = cosmic.accent_color().into();
         let dark = cosmic.is_dark;
-        let (paper, ink, red_letter, shadow) = if dark {
+        // Night: a warm dark sheet on a darker desk, light ink, links a
+        // soft blue. Day: cream on a warm grey desk, near-black ink, links
+        // a slate blue. Change them here and nowhere else.
+        let (desk, paper, ink, accent, red_letter, shadow) = if dark {
             (
+                Color::from_rgb8(0x1B, 0x1A, 0x18),
                 Color::from_rgb8(0x26, 0x23, 0x20),
                 Color::from_rgb8(0xDC, 0xD6, 0xC8),
+                Color::from_rgb8(0x7F, 0xB0, 0xD6),
                 Color::from_rgb8(0xD9, 0x6A, 0x62),
                 Color { a: 0.5, ..Color::BLACK },
             )
         } else {
             (
+                Color::from_rgb8(0xD9, 0xD6, 0xD0),
                 Color::from_rgb8(0xFA, 0xF6, 0xEE),
                 Color::from_rgb8(0x2B, 0x26, 0x20),
+                Color::from_rgb8(0x2F, 0x6F, 0x9F),
                 Color::from_rgb8(0xB4, 0x2A, 0x2A),
                 Color { a: 0.22, ..Color::BLACK },
             )
@@ -1531,6 +1553,7 @@ impl Palette {
         Palette {
             accent,
             muted: cosmic.palette.neutral_7.into(),
+            desk,
             paper,
             ink,
             page_muted: Color { a: 0.6, ..ink },

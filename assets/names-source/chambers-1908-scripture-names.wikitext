@@ -1,0 +1,661 @@
+{{header
+ | title      = [[Chambers's Twentieth Century Dictionary 1908]]
+ | author     =  | override_author = [[Author:Thomas Davidson (1856-1923)|Thomas Davidson]]
+ | translator = 
+ | section    = Pronouncing Vocabulary of Scripture Proper Names
+ | previous   = [[../Correct Ceremonious Forms of Address|Correct Ceremonious Forms of Address]]
+ | next       = [[../The More Common English Christian Names|The More Common English Christian Names]]
+ | notes      = 
+}}
+
+{{center|{{x-larger|PRONOUNCING VOCABULARY OF SCRIPTURE PROPER NAMES.}}}}
+
+:[This vocabulary contains all common Scripture Names except monosyllables and dissyllables, the latter being always accented on the first syllable. ''Ch'' has the sound of ''k'', and so has ''c'', except when marked ''ç'', to indicate the sound of ''s''; ''g'' is hard, except when marked otherwise.]
+
+
+{{block center/s}}
+{| style="width:60em"
+|-
+| style="width:33%" {{ts|vtp}} | A-bad′don.<br />
+Ab′a-na.<br />
+Ab′a-rim.<br />
+A-bed′ne-gō.<br />
+Ā-bel-Me-hō′lah.<br />
+Ā-bel-Miz′rā-im (''or'' -rā′).<br />
+Ā-bel-Shit′tim.<br />
+A-bī′a.<br />
+A-bī′a-thar.<br />
+A-bi-ē′zer.<br />
+Ab′i-gail.<br />
+A-bī′hū.<br />
+A-bī′jah.<br />
+A-bī′jam.<br />
+Ab-i-lē′ne.<br />
+A-bim′e-lech.<br />
+A-bin′a-dab.<br />
+A-bī′ram.<br />
+Ab′i-shag.<br />
+A-bish′ā-ī.<br />
+Ā′bra-ham.<br />
+Ab′sa-lom.<br />
+A-çel′da-ma.<br />
+A-chā′ia (′ya, ''or'' a-kī′a).<br />
+A-dī′nō (''or'' Ad′i-nō)<br />
+A-do-ni-bē′zek.<br />
+Ad-o-nī′jah.<br />
+Ad-o-nī′ram.<br />
+A-do-ni-zē′dek.<br />
+A-dram′me-lech.<br />
+Ad-ra-myt′ti-um.<br />
+A′dri-a.<br />
+Ā′dri-el.<br />
+A-dul′lam.<br />
+Ag′a-bus (''or'' -gā′).<br />
+A-grip′pa.<br />
+A-has-ū-ē′rus.<br />
+Ā-ha-zī′ah.<br />
+A-hī′jah.<br />
+A-him′ā-az.<br />
+A-him′e-lech.<br />
+A-hin′o-am.<br />
+A-hith′o-phel.<br />
+A-hī′tub.<br />
+A-hō′li-ab.<br />
+A-hol′i-bah.<br />
+Aj′a-lon.<br />
+Al-ex-an′dri-a.<br />
+Al-phæ′us (-fē′).<br />
+Al-tas′chith.<br />
+Am′a-lek.<br />
+Am′a-lek-īte (''or'' A-mal′).<br />
+Am′a-na, A-mā′na.<br />
+Am′a-sa, A-mā′sa.<br />
+Am-a-zī′ah.<br />
+A-min′a-dab.<br />
+Am′mon-īte.<br />
+Am′o-rīte.<br />
+Am-phip′o-lis.<br />
+Am′ra-phel.<br />
+An′a-kims.<br />
+A-nam′me-lech.<br />
+An-a-nī′as.<br />
+An′a-thoth.<br />
+An-dro-nī′cus.<br />
+An′ti-och.<br />
+An′ti-pas.<br />
+An-tip′a-tris.<br />
+A-pel′lēs (′lēz).<br />
+Ap-ol-lō′ni-a.<br />
+A-pol′los.<br />
+A-pol′ly-on.<br />
+Ap′pi-ī Fō′rum.<br />
+Aq′ui-la (ak′wi-).<br />
+Ar′a-rat.<br />
+A-rau′nah.<br />
+Ar-che-lā′us.<br />
+Arc-tū′rus.<br />
+Ar-ē-op′a-gus.<br />
+Ar′e-tas.<br />
+Ā′ri-el.<br />
+Ar-i-ma-thē′a.<br />
+A′ri-och.<br />
+Ar-is-tar′chus.<br />
+Ar-is-to-bū′lus.<br />
+Ar-ma-ged′don.<br />
+Ar-mē′ni-a.<br />
+Ar′o-er.<br />
+Ar′te-mas.<br />
+A-ru′mah.<br />
+As′a-hel.<br />
+As′e-nath.<br />
+Ash′ke-naz.<br />
+Ash′tā-roth.<br />
+Ash-tō′reth.<br />
+A′si-a (ā′zhi-a).<br />
+As′ke-lon.<br />
+As-syr′i-a.<br />
+Ath-a-lī′ah.<br />
+At-ta-lī′a.<br />
+Au-gus′tus.<br />
+Az-a-rī′ah.<br />
+A-zō′tus.<br />
+<br />
+Bā′al-ah.<br />
+Bā-al-bē′rith.<br />
+Bā′al-gad.<br />
+Bā-al-hā′zor.<br />
+Bā-al-her′mon.<br />
+Bā-al-mē′on.<br />
+Bā-al-pē′or.<br />
+Bā-al-per′a-zim.<br />
+Bā-al-shal′i-sha (''or'' -lī′).<br />
+Bā-al-tā′mar.<br />
+Bā-al-zē′bub.<br />
+Bā-al-zē′phon.<br />
+Bā′a-sha.<br />
+Bab′y-lon.<br />
+Ba-hū′rim.<br />
+Ba-rab′bas.<br />
+Bar′na-bas.<br />
+Bar′sa-bas.<br />
+Bar-thol′o-mew.<br />
+Bar-ti-mæ′us.<br />
+Bar-zil′lā-ī.<br />
+Bath-shē′ba (''or'' Bath′).<br />
+Bē-el′ze-bub.<br />
+Bē-er-la-hāi′roi.<br />
+Be-ē′roth.<br />
+Bē-er′she-ba (''or'' -shē′).<br />
+Bē′he-moth.<br />
+Bē′li-al.<br />
+Bel-shaz′zar.<br />
+Bel-te-shaz′zar.<br />
+Be-nā′iah (′ya, ''or'' -nī′a).<br />
+Ben-hā′dad.<br />
+Ben′ja-min.<br />
+Be-rē′a.<br />
+Ber-nī′çe.<br />
+Be-rō′dach-bal′a-dan.<br />
+Beth-ab′a-ra.<br />
+Beth′a-ny.<br />
+Beth-ar′bel.<br />
+Beth-ā′ven.<br />
+Be-thes′da (-thez′).<br />
+Beth-hō′ron.<br />
+Beth′le-hem.<br />
+Beth-mā′a-chah.<br />
+Beth-pē′or (''or'' Beth′).<br />
+Beth′pha-gē (-jē).<br />
+Beth-sā′i-da.<br />
+Beth-shē′mesh (''or'' Beth′).<br />
+Be-thū′el (''or'' Beth′).<br />
+Be-zal′e-el.<br />
+Bi-thyn′i-a.<br />
+Bō-a-ner′gēs (′jēz).<br />
+<br />
+Cā′ia-phas (kā′ya- ''or'' kī′a-).<br />
+Cal′va-ry.<br />
+Cā′naan-īte.<br />
+Can′da-çē.<br />
+Ca-per′nā-um.<br />
+Cap-pa-dō′ci-a (′shi-).<br />
+Car′che-mish.<br />
+Cen′chre-a (sen′).<br />
+Cēs-a-rē′a.<br />
+Chal-dē′an.<br />
+Ched-or-lā′o-mer (''or'' -lā-ō′).<br />
+Chem′a-rims.<br />
+Cher′eth-ītes.<br />
+Chin′ne-reth.<br />
+Cho-rā′zin.<br />
+Chū-shan-rish-a-thā′im.<br />
+Ci-lic′i-a (si-lish′i-a).<br />
+Cin′ne-roth (sin′).<br />
+Clau′di-a.<br />
+Clau′di-us.<br />
+Clē′o-phas.<br />
+Co-los′sē.<br />
+Co-nī′ah.<br />
+Cor-nē′li-us.<br />
+Cy-rē′nē (sī-).<br />
+Cy-rē′ni-us (sī-).<br />
+<br />
+Dal-ma-nū′tha.<br />
+Dal-mā′ti-a (′shi-).<br />
+Dam′a-ris.<br />
+Da-mas′cus.<br />
+Dan′i-el.<br />
+Da-rī′us.<br />
+Deb′o-rah (''or'' -bō′).<br />
+De-cap′o-lis.<br />
+Del′i-lah (Heb. De-lī′lah).<br />
+De-mē′tri-us.<br />
+Dī-an′a.<br />
+Dī-o-nys′i-us (-nish′).<br />
+Dī-ot′re-phēs (-fēz).<br />
+Dru-sil′la.<br />
+<br />
+Ē-bed-mē′lech.<br />
+Eb-en-ē′zer.<br />
+Ē′dom-īte.<br />
+Ed′re-ī.<br />
+El-ē′a-leh.<br />
+El-ē-ā′zar.<br />
+El-e-lō′he-Is′ra-el.<br />
+El-hā′nan.<br />
+E-lī′ab.<br />
+E-lī′a-kim.<br />
+E-lī′a-shib.<br />
+El-i-ē′zer.<br />
+E-lī′hū.<br />
+E-lī′jah.<br />
+E-lim′e-lech.<br />
+| style="width:33%" {{ts|vtp}} | El′i-phaz.<br />
+E-lī′sha.<br />
+E-lish′e-ba (''or'' -shē′).<br />
+El′ka-nah.<br />
+El′la-sar.<br />
+El′nā-than.<br />
+E-lō′ī.<br />
+El′y-mas.<br />
+Ē′ne-as.<br />
+Em′ma-us (''or'' Em-mā′).<br />
+En-eg-lā′im.<br />
+En′gē-dī (''or'' -ged′).<br />
+En-rō′gel.<br />
+Ep′a-phras.<br />
+E-paph-ro-dī′tus.<br />
+Eph′e-sus.<br />
+Ē′phrā-im.<br />
+Eph′ra-tah.<br />
+Ep-i-cū-rē′ans.<br />
+E-ras′tus.<br />
+Ē-sar-had′don.<br />
+Es-dra-ē′lon.<br />
+Esh′tā-ol.<br />
+Ē-thi-ō′pi-a.<br />
+Eū-nī′çe.<br />
+Eū-ō′di-as.<br />
+Eū-phrā′tēs (′tēz).<br />
+Eū-roc′ly-don.<br />
+Eū′ty-chus.<br />
+Ē-vil-me-rō′dach (or -mer′).<br />
+Ex′o-dus.<br />
+E-zē′ki-el.<br />
+Ē-zi-on-gā′ber.<br />
+<br />
+For-tū-nā′tus.<br />
+<br />
+Gab′ba-tha.<br />
+Gā′bri-el.<br />
+Gad′a-rēnes.<br />
+Ga-lā′ti-a (-lā′shi-a)<br />
+Gal′e-ed.<br />
+Gal-i-lē′an.<br />
+Gal′i-lee.<br />
+Gal′li-o.<br />
+Ga-mā′li-el.<br />
+Ged-a-lī′ah.<br />
+Ged′e-roth.<br />
+Ge-hā′zī.<br />
+Gem-a-rī′ah.<br />
+Gen-nes′a-ret.<br />
+Gen′e-sis (jen′).<br />
+Ge-nū′bath.<br />
+Ger′ge-sēnes.<br />
+Ger′i-zim (Heb. Ge-riz′zim).<br />
+Geth-sem′a-ne.<br />
+Gib′be-thon.<br />
+Gib′e-ah.<br />
+Gib′e-on.<br />
+Gid′e-on.<br />
+Gil-bō′a.<br />
+Gil′e-ad.<br />
+Gir′gash-īte.<br />
+Gol′go-tha.<br />
+Go-lī′ath.<br />
+Go-mor′rah.<br />
+<br />
+Hab′ak-kuk.<br />
+Hach′i-lah.<br />
+Had-ad-ē′zer.<br />
+Had-ad-rim′mon.<br />
+Hā′gar-ēnes.<br />
+Hag′gā-ī.<br />
+Ha-nan′e-el.<br />
+Ha-nā′nī.<br />
+Han-a-nī′ah.<br />
+Har′ō-sheth (''or'' -rō′).<br />
+Hav′i-lah.<br />
+Hā-voth-jā′ir.<br />
+Haz′ā-el (or Hā′).<br />
+Heph′zi-bah.<br />
+Her-mog′e-nēs (-moj′e-nēz).<br />
+He-rō′di-ans.<br />
+He-rō′di-as.<br />
+He-rō′di-on.<br />
+Hez-e-kī′-ah.<br />
+Hid′de-kel (''or'' -dek′).<br />
+Hī-e-rap′o-lis.<br />
+Hig-gāi′on (′gi- ''or'' gā′yon).<br />
+Hil-kī′ah.<br />
+Ho-sē′a (-zē′).<br />
+Ho-shē′a.<br />
+H<span style="text-decoration: overline;">y</span>-me-næ′us.<br />
+<br />
+Ich′a-bod.<br />
+I-cō′ni-um.<br />
+Id-ū-mē′a.<br />
+Il-lyr′-i-cum.<br />
+Im-man′ū-el.<br />
+I-sai′ah (ī-zī′a ''or'' ī-zā′ya).<br />
+Is-car′i-ot.<br />
+Ish′bo-sheth (''or'' -bō′).<br />
+Ish′mā-el.<br />
+Ish′mā-el-īte.<br />
+Is′rā-el (iz′).<br />
+Is′rā-el-īte (iz′).<br />
+Is′sa-char.<br />
+Ith′a-mar.<br />
+It′tā-ī.<br />
+It-ū-rē′a.<br />
+<br />
+Jā-besh-gil′e-ad.<br />
+Jab′ne-el.<br />
+Jā′ir-us.<br />
+Jeb′ū-sīte.<br />
+Jec-o-nī′ah.<br />
+Jed′ū-thun.<br />
+Jē-gar-sā-ha-dū′tha.<br />
+Je-hō′a-haz.<br />
+Je-hō′ash.<br />
+je-hoi′a-chin.<br />
+Je-hoi′a-da.<br />
+Je-hoi′a′-kim.<br />
+Je-hon′a-dab.<br />
+Je-hō′ram.<br />
+Je-hosh′a-phat.<br />
+Je-hosh′e-ba.<br />
+Je-hō-vah-jī′reh.<br />
+Je-hō-vah-nis′sī.<br />
+Je-hō-vah-shā′lom.<br />
+Jer-e-mī′ah.<br />
+Jer′i-chō.<br />
+Jer-o-bō′am.<br />
+Je-rub′ba-al (''or'' -bā′).<br />
+Je-ru′sa-lem.<br />
+Jesh′i-mon.<br />
+Jesh′ū-run.<br />
+Jez′e-bel.<br />
+Jez′re-el.<br />
+Jo-an′na.<br />
+Joch′e-bed (''or'' -eb′).<br />
+Jo-hā′nan (''or'' Jō′).<br />
+Jon′a-dab.<br />
+Jon′a-than.<br />
+Josh′-ū-a.<br />
+Jo-sī′ah.<br />
+Joz′a-char.<br />
+Jū-dē′a.<br />
+Jū′li-us.<br />
+Jū′pi-ter.<br />
+<br />
+Kad′mon-ītes.<br />
+Ked′e-moth.<br />
+Ken′niz-zītes.<br />
+Kē′ri-oth.<br />
+Ke-tū′rah.<br />
+Kib-roth-hat-tā′a-vah.<br />
+Kir-hē′res.<br />
+Kir-jath-ā′im.<br />
+Kir-jath-ar′ba.<br />
+Kir-jath-hū′zoth.<br />
+Kir-jath-jē′a-rim.<br />
+<br />
+La-hai′roi (-hī′).<br />
+Lā-od-i-çē′a.<br />
+La-sē′a.<br />
+Laz′a-rus.<br />
+Leb′a-non.<br />
+Leb-bē′us.<br />
+Lem′ū-el.<br />
+Le-vī′a-than.<br />
+Lib′er-tīnes.<br />
+Lib′y-a.<br />
+Lō-am′mī.<br />
+Lō-rū′ha-mah (''or'' -hā′).<br />
+Lū′çi-fer.<br />
+Lū′-ci-us (lū′shi-us).<br />
+Lyc-a-ō′ni-a.<br />
+Lyc-i-a (lish′i-a).<br />
+Lyd′i-a.<br />
+L<span style="text-decoration: overline;">y</span>-sā′ni-as.<br />
+Lys-i-as (lish′i-as).<br />
+<br />
+Mā′a-cah.<br />
+Maç-e-dō′ni-a.<br />
+Mach-pē′lah (''or'' Mach′).<br />
+Mag′da-la.<br />
+Mā′ha-lath.<br />
+Mā-ha-nā′im.<br />
+Mā-her-shal-al-hash′baz.<br />
+Mak-kē′dah.<br />
+Mal′a-chī.<br />
+Man′ā-en.<br />
+Ma-nas′seh.<br />
+Ma-nō′ah.<br />
+Mar-a-nath′a.<br />
+Ma-rē′shah (''or'' Mar′).<br />
+Mat-ta-nī′ah.<br />
+Mat-thī′as (Math-thī′as).<br />
+Maz′za-roth.<br />
+Med′e-ba.<br />
+Me-gid′do.<br />
+Mel-chiz′e-dek.<br />
+Mel′i-ta.<br />
+Men′a-hem.<br />
+Me-phib′o-sheth (or Me-phi-bō′).<br />
+Mer′a-rī.<br />
+Mer-a-thā′im.<br />
+Mer′i-bah.<br />
+Me-rō-dach-bal′a-dan.<br />
+Mes-o-po-tā′mi-a.<br />
+Mes-sī′ah.<br />
+Mē-theg-am′mah.<br />
+Me-thū′se-lah.<br />
+Mī-cai′ah (-kī′a ''or'' -kā′ya).<br />
+| style="width:33%" {{ts|vtp}} | Mī′cha-el.<br />
+Mī-chai′ah (-kī′a or -kā′ya).<br />
+Mid′i-an-īte.<br />
+Mī-lē′tus.<br />
+Mir′i-am.<br />
+Mit-y-lē′nē.<br />
+Miz′rā-im.<br />
+Mō′ab-īte.<br />
+Mor-de-cā′ī, Mor′-de-cai (-kī).<br />
+Mo-rī′ah.<br />
+Mys-i-a (mizh′i-a).<br />
+<br />
+Nā′a-man.<br />
+Nai′oth (nī′ ''or'' nā′-yoth).<br />
+Nā′o-mī ''or'' Nā-ō′mī.<br />
+Naph′ta-lī.<br />
+Na-than′ā-el.<br />
+Naz′a-rēne.<br />
+Naz′a-reth.<br />
+Naz′a-rīte.<br />
+Ne-ap′o-lis.<br />
+Ne-bai′oth (-bī′, ''or'' Ne-bā′yoth).<br />
+Neb-ū-chad-nez′zar.<br />
+Neb-ū-zar′a-dan.<br />
+Neg′i-noth.<br />
+Nē-he-mī′ah.<br />
+Nē′hi-loth.<br />
+Ne-hush′tan.<br />
+Neth′i-nims.<br />
+Nī-cā′nor.<br />
+Nic-o-dē′mus.<br />
+Nic-o-lā′i-tans.<br />
+Nic′o-las.<br />
+Nī-cop′o-lis.<br />
+Nin-e-veh.<br />
+<br />
+Ō-ba-dī′ah.<br />
+Ō-bed-ē′dom.<br />
+Ō′me-ga.<br />
+O-nē′si-mus.<br />
+On-ē-siph′o-rus.<br />
+O-rī′on.<br />
+Oth′ni-el.<br />
+<br />
+Pā-dan-ā′ram.<br />
+Pal′es-tīne.<br />
+Pam-phyl′i-a.<br />
+Par′me-nas.<br />
+Par′thi-ans.<br />
+Par-vā′im.<br />
+Pat′a-ra.<br />
+Pek-a-hī′ah.<br />
+Pel-a-tī′ah.<br />
+Pē′leth-ītes.<br />
+Pe-nī′el.<br />
+Pe-nū′el.<br />
+Per′a-zim.<br />
+Pē-rez-uz′zah.<br />
+Per′ga-mos.<br />
+Per′iz-zīte.<br />
+Per′-si-a (per′shi-a).<br />
+Phal′ti-el.<br />
+Phā-raōh-hoph′ra (fā′rō- ''or'' fā′ra-ō-).<br />
+Phā-raōh-nē′choh.<br />
+Phē-nī′çe.<br />
+Phē-nic′i-a (-nish′).<br />
+Phil-a-del′phi-a.<br />
+Phī-lē′mon.<br />
+Phī-lē′tus.<br />
+Phi-lip′pi.<br />
+Phil′is-tine (-tin).<br />
+Phin′e-has.<br />
+Phryg′i-a (frij′).<br />
+Pī-hā-hī′roth.<br />
+Pir′a-thon.<br />
+Pi-sid′i-a.<br />
+Plē′ia-dēs (′ya-dēz ''or'' plī′a-).<br />
+Pot′i-phar.<br />
+Po-tiph′e-rah.<br />
+Pris-çil′la.<br />
+Proch′o-rus.<br />
+Ptol-e-mā′is (tol-).<br />
+Pub′li-us.<br />
+Pu-tē′o-lī.<br />
+<br />
+Rā′a-mah.<br />
+Rā-am′sēs (′sēz).<br />
+Rab′sha-keh (-kā).<br />
+Ra-gū′el.<br />
+Rā-math-a′im.<br />
+Rā-math-lē′hī.<br />
+Ra-mē′sēs (′sēz ''or'' Ram′).<br />
+Rā-moth-gil′e-ad.<br />
+Re-bek′ah.<br />
+Rē′chab-ītes (''or'' Rech′).<br />
+Rē-ho-bō′am.<br />
+Re-hō′both.<br />
+Reph′ā-im.<br />
+Reph′i-dim.<br />
+Rhē′gi-um (rē′ji-).<br />
+<br />
+Sa-bā′oth.<br />
+Sa-bē′ans.<br />
+Sal′a-mis.<br />
+Sal-mō′nē.<br />
+Sa-lō′mē.<br />
+Sa-mā′ri-a.<br />
+Sa-mar′i-tan.<br />
+Sam-o-thrā′ci-a (-thrā′shi-a).<br />
+Sam′ū-el.<br />
+San-bal′lat.<br />
+Sap-phī′ra (saf-fī′).<br />
+Sa-rep′ta.<br />
+Scyth′i-an (sith′).<br />
+Se-cun′dus.<br />
+Se-leu′ci-a (′shi-a ''or'' Se-leu-çī′a).<br />
+Sen-nach′e-rib.<br />
+Seph′a-rad.<br />
+Seph-ar-vā′im.<br />
+Ser-ai′ah (-ī′a ''or'' -ā′ya).<br />
+Ser′gi-us (′ji-).<br />
+Shal′i-sha.<br />
+Shal-ma-nē′ser (′zer).<br />
+Sha-rē′zer.<br />
+Shem-ai′ah (-ī′a).<br />
+Shem′i-nith.<br />
+Sheph-a-tī′ah.<br />
+Shesh-baz′zar.<br />
+Shē′thar-boz′na-ī.<br />
+Shig-gai′on (-gī′on).<br />
+Shim′e-ī.<br />
+Sho-shan′nim.<br />
+Shū′lam-īte.<br />
+Si-lō′am.<br />
+Sil-vā′nus.<br />
+Sim′e-on.<br />
+Sir′i-on.<br />
+Sis′e-ra.<br />
+Sod′om-ītes.<br />
+Sol′o-mon.<br />
+Sō′pa-ter.<br />
+Sō-sip′a-ter.<br />
+Sos′the-nēs (-nēz).<br />
+Steph′a-nas.<br />
+Suk′ki-ims.<br />
+Su-san′na (-zan′).<br />
+S<span style="text-decoration: overline;">y</span>-ē′nē.<br />
+Syn′ty-chē.<br />
+Syr′a-cūse.<br />
+Syr′-i-a.<br />
+S<span style="text-decoration: overline;">y</span>-ro-phe-nic′i-an (-nish′i-an).<br />
+<br />
+Tā′a-nach.<br />
+Tab′e-rah.<br />
+Tab′i-tha.<br />
+Ta-hap′a-nēs (-nēz).<br />
+Tah′pan-hēs (-hēz).<br />
+Tah′pe-nēs (-nēz).<br />
+Tap-pū′ah.<br />
+Te-haph′ne-hēs (-hēz).<br />
+Te-kō′ah.<br />
+Ter′ti-us (′shi-us).<br />
+Ter-tul′lus.<br />
+Thad-dæ′us.<br />
+The-oph′i-lus.<br />
+Thes-sa-lo-nī′ca.<br />
+Th<span style="text-decoration: overline;">y</span>-a-tī′ra.<br />
+Tī-bē′ri-as.<br />
+Tī-bē′ri-us.<br />
+Tig-lath-pi-lē′ser (′zer).<br />
+Tim-nath-hē′rēs (′rēz).<br />
+Tim-nath-sē′rah.<br />
+Tim′o-thy.<br />
+Tir′ha-kah.<br />
+Tir′ha-nah.<br />
+Tir′sha-tha (''or'' -shā′).<br />
+To-bī′ah.<br />
+To-bī′jah.<br />
+To-gar′mah.<br />
+Trach-o-nī′tis.<br />
+Tro-gyl′li-um (-jil′).<br />
+Troph′i-mus.<br />
+Tr<span style="text-decoration: overline;">y</span>-phē′na.<br />
+Tr<span style="text-decoration: overline;">y</span>-phō′sa.<br />
+Tū′bal-cain (-kān).<br />
+Tych′i-cus.<br />
+Ty-ran′nus.<br />
+<br />
+U-phar′sin (ū-).<br />
+U-rī′ah (ū-).<br />
+U-rī′jah (ū-).<br />
+Uz-zī′ah.<br />
+<br />
+Zac-chæ′us.<br />
+Zach-a-rī′ah.<br />
+Zach-a-rī′as.<br />
+Zal-mun′na.<br />
+Zam-zum′mims.<br />
+Zar′e-phath.<br />
+Zar′e-tan.<br />
+Zeb′e-dee.<br />
+Ze-boi′im.<br />
+Ze-bō′im.<br />
+Zeb′ū-lun.<br />
+Zech-a-rī′ah.<br />
+Zed-e-kī′ah.<br />
+Ze-lō′phe-had.<br />
+Zem-a-rā′im.<br />
+Zeph-a-nī′ah.<br />
+Zeph′a-thah.<br />
+Ze-rub′ba-bel.<br />
+Zer-ū-ī′ah.<br />
+Zip-pō′rah.<br />
+|}
+{{block center/e}}

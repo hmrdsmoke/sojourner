@@ -1,0 +1,697 @@
+;;; The lines of cmudict.dict (cmusphinx/cmudict, master, SHA-256 81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22)
+;;; whose word is one of the proper names of the World English Bible text (web-names.tsv). Extracted 2026-09-23 by tools/names/compose.py --extract. License: LICENSE.cmudict.
+aaron EH1 R AH0 N
+abba AE1 B AH0
+abel EY1 B AH0 L
+abigail AE1 B AH0 G EY2 L
+abilene AE1 B IH0 L IY2 N
+abimael AE2 B IH0 M EY1 L
+abner AE1 B N ER0
+abraham EY1 B R AH0 HH AE2 M
+abram AH0 B R AE1 M
+absalom AE1 B S AH0 L AH0 M
+acco AE1 K OW0
+achor EY1 K ER0
+acquaint AH0 K W EY1 N T
+adah AE1 D AA0
+adalia AA0 D AA1 L IY0 AH0
+adam AE1 D AH0 M
+adami AA0 D AA1 M IY0
+adar AH0 D AA1 R
+adin AH0 D IH1 N
+adina AA0 D IY1 N AH0
+adlai AA0 D L AA1 IY0
+adora AA0 D AO1 R AH0
+adriatic EY2 D R IY0 AE1 T IH0 K
+adriel AH0 D R IY1 L
+aeneas AE1 N IY0 AH0 S
+agar EY1 G ER0
+agee EY1 JH IY1
+agrippa AH0 G R IH1 P AH0
+ah AA1
+aha AA2 HH AA1
+ahab EY1 HH AE2 B
+ahasuerus AH0 HH AE2 SH AH0 W EH1 R AH0 S
+ai AY1
+ai(2) EY1 AY1
+alas AH0 L AE1 S
+alexander AE2 L AH0 G Z AE1 N D ER0
+alexander(2) AE2 L IH0 G Z AE1 N D ER0
+alexandria AE2 L AH0 G Z AE1 N D R IY0 AH0
+allar AH0 L AA1 R
+almon AA1 L M AH0 N
+alpha AE1 L F AH0
+alvah AE0 L V AA1
+alvan AE1 L V AH0 N
+amal AH0 M AA1 L
+aman AA1 M AH0 N
+amana AH0 M AE1 N AH0
+amasa AE1 M AH0 S AH0
+ami AA1 M IY0
+ammon AE1 M AH0 N
+ammonite AE1 M AH0 N AY2 T
+ammonites AE1 M AH0 N AY2 T S
+amok AH0 M AH1 K
+amon AA0 M AO1 N
+amos EY1 M AH0 S
+amuse AH0 M Y UW1 Z
+andrew AE1 N D R UW0
+anna AE1 N AH0
+annas AE1 N AH0 Z
+annis AE1 N IY0 Z
+antioch AE1 N T IY0 AA2 K
+antiochus AE0 N T AY1 AH0 K AH0 S
+aquila AE1 K W AH0 L AH0
+ar AA1 R
+ara AE1 R AH0
+arab AE1 R AH0 B
+arab(2) EY1 R AH0 B
+arabia AH0 R EY1 B IY0 AH0
+arabian AH0 R EY1 B IY0 AH0 N
+arabians AH0 R EY1 B IY0 AH0 N Z
+aramaic AA2 R AA0 M EH1 Y IH0 K
+aran EH1 R AH0 N
+ararat AE1 R AH0 R AA2 T
+arba AA1 R B AH0
+arbel AA1 R B AH0 L
+archippus AE2 R K IH1 P AH0 S
+ard AA1 R D
+ares AA1 R Z
+ariel EH1 R IY0 AH0 L
+arming AA1 R M IH0 NG
+artemas AA1 R T IH0 M AH0 Z
+arvad AA0 R V AE1 D
+asa AA1 S AH0
+asher AE1 SH ER0
+asia EY1 ZH AH0
+asiatic EY2 ZH IY0 AE1 T IH0 K
+asiel AE1 Z IY0 AH0 L
+assassins AH0 S AE1 S AH0 N Z
+assaulting AH0 S AO1 L T IH0 NG
+assyria AH0 S IH1 R IY0 AH0
+assyrian AH0 S IH1 R IY0 AH0 N
+assyrians AH0 S IH1 R IY0 AH0 N Z
+astounding AH0 S T AW1 N D IH0 NG
+ater EY1 T ER0
+athenians AH0 TH IY1 N IY0 AH0 N Z
+athens AE1 TH AH0 N Z
+attach AH0 T AE1 CH
+augustus AA0 G AH1 S T AH0 S
+augustus(2) AH0 G AH1 S T AH0 S
+aven AA0 V EY1 N
+aviv AA0 V IY1 V
+babel B AE1 B AH0 L
+babylon B AE1 B AH0 L AA2 N
+babylonian B AE2 B AH0 L OW1 N IY0 AH0 N
+babylonians B AE2 B AH0 L OW1 N IY0 AH0 N Z
+balak B AA2 L AH0 K
+barak B AA1 R AH0 K
+barnabas B AA1 R N AH0 B AH0 S
+bartholomew B AA0 R TH AA1 L AH0 M Y UW2
+baruch B AA2 R UW1 K
+bathsheba B AE0 TH SH IY1 B AH0
+baz B AE1 Z
+bazan B EY1 Z AH0 N
+becher B EH1 K ER0
+beholding B IH0 HH OW1 L D IH0 NG
+bel B EH1 L
+bela B EH1 L AH0
+ben B EH1 N
+bene B EH1 N AH0
+benjamin B EH1 N JH AH0 M AH0 N
+beno B EY1 N OW0
+benoni B EH0 N OW1 N IY0
+bera B EH1 R AH0
+berea B ER0 IY1 AH0
+bernice B ER0 N IY1 S
+beth B EH1 TH
+bethany B EH1 TH AH0 N IY0
+bethel B EH1 TH AH0 L
+bethel(2) B EH1 TH EH2 L
+bethesda B AH0 TH EH1 Z D AH0
+bethlehem B EH1 TH L IH0 HH EH2 M
+beulah B Y UW1 L AH0
+bezek B EH1 Z EH0 K
+boaz B OW1 AE0 Z
+bohan B OW1 HH AH0 N
+brethren B R EH1 DH R AH0 N
+bunni B UW1 N IY0
+caesar S IY1 Z ER0
+caesarea K EY2 S ER0 IY1 AH0
+cain K EY1 N
+caleb K EY1 L AH0 B
+cana K AE1 N AH0
+canaan K EY1 N AH0 N
+canaanite K EY1 N AH0 N AY2 T
+candace K AE1 N D AH0 S
+capernaum K AH0 P ER1 N IY0 AH0 M
+carmel K AA0 R M EH1 L
+carmel(2) K AA1 R M AH0 L
+carmelite K AA1 R M AH0 L AY2 T
+cephas S EH1 F AH0 Z
+chisel CH IH1 Z AH0 L
+chloe K L OW1 IY0
+christ K R AY1 S T
+christian K R IH1 S CH AH0 N
+christian(2) K R IH1 S CH IH0 N
+christians K R IH1 S CH AH0 N Z
+christians(2) K R IH1 S CH IH0 N Z
+cilicia S IH0 L IH1 SH AH0
+claudia K L AO1 D IY0 AH0
+claudius K L AO1 D IY0 AH0 S
+clement K L EH1 M AH0 N T
+cleopatra K L IY2 AH0 P AE1 T R AH0
+corban K AO1 R B AH0 N
+corinth K AO1 R AH0 N TH
+corinthians K ER0 IH1 N TH IY0 AH0 N Z
+cornelius K AO0 R N IY1 L Y AH0 S
+cos K AO1 S
+crates K R EY1 T S
+crete K R IY1 T
+cush K AH1 SH
+cush(2) K UH1 SH
+cyprus S AY1 P R AH0 S
+cyrus S AY1 R AH0 S
+damaris D AH0 M AA1 R AH0 S
+damascus D AH0 M AE1 S K AH0 S
+dan D AE1 N
+daniel D AE1 N Y AH0 L
+daphne D AE1 F N IY0
+dara D AE1 R AH0
+darius D ER0 AY1 AH0 S
+david D EY1 V IH0 D
+debate D AH0 B EY1 T
+deborah D EH1 B ER0 AH0
+deborah(2) D EH1 B R AH0
+deity D IY1 AH0 T IY0
+delilah D AH0 L AY1 L AH0
+delilah(2) D IH0 L AY1 L AH0
+demas D IY1 M AH0 S
+demetrius D IH0 M IY1 T R IY0 AH0 S
+deuel D UW1 EH0 L
+dimon D IH1 M AH0 N
+dinah D AY1 N AH0
+dionysius D AY2 AH0 N IH1 S IY0 AH0 S
+dishon D IH1 S AH0 N
+dodo D OW1 D OW0
+dorcas D AO1 R K AH0 S
+dothan D AA1 TH AH0 N
+drusilla D R UW2 S IH1 L AH0
+dura D UH1 R AH0
+ebenezer EH2 B IH0 N IY1 Z ER0
+eber EH1 B ER0
+ebron EH1 B R AH0 N
+eden IY1 D AH0 N
+eder EH1 D ER0
+edna EH1 D N AH0
+egypt IY1 JH AH0 P T
+egypt(2) IY1 JH IH0 P T
+egyptian IH0 JH IH1 P SH AH0 N
+egyptians IH0 JH IH1 P SH AH0 N Z
+ehud EH0 HH AH1 D
+el EH1 L
+ela EH1 L AH0
+elam EH1 L AH0 M
+eleazer EH1 L AH0 Z ER0
+eli IY1 L AY0
+elihu EH1 L IH0 HH UW0
+elijah EH0 L AY1 JH AH0
+elijah(2) IY0 L AY1 JH AH0
+elisha EH1 L IH0 SH AH0
+elizabeth IH0 L IH1 Z AH0 B AH0 TH
+elizabeth(2) IH0 L IH1 Z AH0 B IH0 TH
+embarking EH0 M B AA1 R K IH0 NG
+emmaus EH1 M AW0 S
+emmer EH1 M ER0
+en EH1 N
+endear EH0 N D IY1 R
+enlisting EH0 N L IH1 S T IH0 NG
+enlisting(2) IH0 N L IH1 S T IH0 NG
+enoch IY1 N AH0 K
+enos IY1 N AH0 S
+ensure EH0 N SH UH1 R
+ensure(2) IH0 N SH UH1 R
+ephesus EH1 F UH0 S AH0 S
+ephraim IY1 F R AH0 M
+ephron EH1 F R AH0 N
+epicurean EH2 P AH0 K Y UH0 R IY1 AH0 N
+epicurean(2) EH2 P AH0 K Y UH1 R IY0 AH0 N
+er ER0
+erastus IH0 R AE1 S T AH0 S
+esau IY1 S AO2
+esteem AH0 S T IY1 M
+esther EH1 S T ER0
+ethan IY1 TH AH0 N
+ether IY1 TH ER0
+ethiopia IY2 TH IY0 OW1 P IY0 AH0
+ethiopian IY2 TH IY0 OW1 P IY0 AH0 N
+ethiopians IY2 TH IY0 OW1 P IY0 AH0 N Z
+eunice Y UW1 N AH0 S
+eunice(2) Y UW1 N IH0 S
+euphrates Y UW0 F R EY1 T IY0 Z
+eve IY1 V
+extort EH0 K S T AO1 R T
+ezekiel EH1 Z IH0 K IY2 L
+ezer EH1 Z ER0
+ezra EH1 Z R AH0
+felix F IY1 L IH0 K S
+festus F EH1 S T AH0 S
+figuratively F IH0 G Y UH1 R AH0 T IH0 V L IY0
+fix F IH1 K S
+founder F AW1 N D ER0
+fraudulent F R AO1 JH AH0 L AH0 N T
+gaal G AA1 L
+gabriel G EY1 B R IY0 AH0 L
+gad G AE1 D
+gaddis G AE1 D IH0 S
+gai G EY1
+galilean G AE2 L AH0 L IY1 AH0 N
+galilee G AE1 L AH0 L IY2
+gas G AE1 S
+gath G AE1 TH
+gauls G AO1 L Z
+gaza G AA1 Z AH0
+gentile JH EH1 N T AY2 L
+gentiles JH EH1 N T AY2 L Z
+gera JH EH1 R AH0
+gershon G ER1 SH AH0 N
+gerson JH ER1 S AH0 N
+gerson(2) G ER1 S AH0 N
+gideon G IH1 D IY0 AH0 N
+gilead G IH0 L IY1 D
+gob G AA1 B
+golan G OW1 L AH0 N
+golan(2) G AH0 L AA1 N
+goliath G AH0 L AY1 AH0 TH
+gomer G OW1 M ER0
+gomorrah G AH0 M AO1 R AH0
+goshen G OW1 SH IH0 N
+greece G R IY1 S
+greek G R IY1 K
+greeks G R IY1 K S
+ha HH AA1
+hadad HH AE1 D AH0 D
+hadar HH AE1 D ER2
+haddon HH AE1 D AH0 N
+hadid HH AA0 D IY1 D
+hagar HH EY1 G AA0 R
+hagar(2) HH EY1 G ER0
+hallelujah HH AE2 L AH0 L UW1 Y AH0
+ham HH AE1 M
+haman HH EY1 M AH0 N
+hammon HH AE1 M AH0 N
+hamon HH AE1 M AH0 N
+hamor HH AE1 M ER0
+hanan HH EY1 N AH0 N
+hanes HH EY1 N Z
+hannah HH AE1 N AH0
+hara HH EH1 R AH0
+haran HH AE1 R AH0 N
+harmon HH AA1 R M AH0 N
+harsha HH AA1 R SH AH0
+hash HH AE1 SH
+hashem HH AE1 SH IH0 M
+havens HH EY1 V AH0 N Z
+heber HH IY1 B ER0
+hebrew HH IY1 B R UW0
+hebrews HH IY1 B R UW0 Z
+hebron HH EH1 B R AH0 N
+hebron(2) HH EH1 B R AO2 N
+heman HH IY1 M AH0 N
+hence HH EH1 N S
+hercules HH ER1 K Y AH0 L IY2 Z
+hereby HH IH0 R B AY1
+hermes HH ER1 M IY0 Z
+hermon HH ER1 M AH0 N
+herod HH EH1 R AH0 D
+heth HH EH1 TH
+hey HH EY1
+hillel HH IH2 L EH1 L
+hiram HH AY1 R AH0 M
+hittite HH IH1 T AY2 T
+hoisting HH OY1 S T IH0 NG
+hori HH AO1 R IY0
+hosea HH OW0 S IY1 AH0
+hosea(2) HH OW0 Z EY1 AH0
+hur HH ER1
+hurling HH ER1 L IH0 NG
+hush HH AH1 SH
+hyenas HH AY0 IY1 N AH0 Z
+immanuel IH1 M AH0 N UH0 L
+india IH1 N D IY0 AH0
+indian IH1 N D IY0 AH0 N
+ira AY1 R AH0
+ira(2) AY2 AA2 R EY1
+isaac AY1 Z AH0 K
+isaac(2) AY1 Z IH0 K
+isaiah AY2 Z EY1 AH0
+iscariot IH2 S K EH1 R IY0 AH0 T
+ishi IH1 SH IY0
+ishmael IH1 SH M IY0 L
+ishmael(2) IH1 SH M EY0 L
+israel IH1 Z R IY0 AH0 L
+israel(2) IH1 Z R EY0 L
+israelite IH1 Z R AH0 L AY2 T
+israelites IH1 Z R AH0 L AY2 T S
+italian IH2 T AE1 L Y AH0 N
+italians IH2 T AE1 L Y AH0 N Z
+italy IH1 T AH0 L IY0
+jaan Y AA1 N
+jaan(2) JH AE1 N
+jacob JH EY1 K AH0 B
+james JH EY1 M Z
+jared JH EH1 R IH0 D
+jason JH EY1 S AH0 N
+javan JH AH0 V AA1 N
+jemimah JH EH0 M AY1 M AH0
+jeremiah JH EH2 R AH0 M AY1 AH0
+jeremy JH EH1 R AH0 M IY2
+jericho JH EH1 R IH0 K OW2
+jeroboam JH EH2 R AH0 B OW1 AH0 M
+jerusalem JH ER0 UW1 S AH0 L AH0 M
+jerusha JH EH1 R AH0 SH AH0
+jesse JH EH1 S IY0
+jesus JH IY1 Z AH0 S
+jethro JH EH1 TH R OW0
+jew JH UW1
+jewess JH UW1 AH0 S
+jewish JH UW1 IH0 SH
+jewry JH UW1 R IY0
+jews JH UW1 Z
+joanna JH OW0 AE1 N AH0
+job JH AA1 B
+job(2) JH OW1 B
+joel JH OW1 AH0 L
+john JH AA1 N
+jonah JH OW1 N AH0
+jonas JH OW1 N AH0 S
+jonathan JH AA1 N AH0 TH AH0 N
+jordan JH AO1 R D AH0 N
+jose HH OW2 Z EY1
+joseph JH OW1 S AH0 F
+joseph(2) JH OW1 Z AH0 F
+josephus JH OW0 S IY1 F AH0 S
+joshua JH AA1 SH UW2 AH0
+josiah JH OW0 S AY1 AH0
+judah JH UW1 D AH0
+judas JH UW1 D AH0 S
+jude JH UW1 D
+judea JH UW0 D IY1 AH0
+judith JH UW1 D AH0 TH
+judith(2) JH UW1 D IH0 TH
+juel JH UW1 L
+julia JH UW1 L Y AH0
+julius JH UW1 L Y AH0 S
+junia Y UW1 N IY0 AH0
+jupiter JH UW1 P AH0 T ER0
+jupiter(2) JH UW1 P IH0 T ER0
+justus JH AH1 S T AH0 S
+kain K EY1 N
+kedar K IY1 D ER0
+kenan K IY1 N AH0 N
+keren K EH1 R EH2 N
+keziah K AH0 Z IY1 AH0
+kir K IH1 R
+kish K IH1 SH
+kishi K IY1 SH IY0
+laban L EY1 B AH0 N
+ladder L AE1 D ER0
+latin L AE1 T AH0 N
+lazarus L AE1 Z ER0 AH0 S
+leah L IY1 AH0
+lebanon L EH1 B AH0 N AH0 N
+levi L IY1 V AY0
+levis L EH1 V IH0 S
+levis(2) L IY1 V AY2 Z
+libertines L IH1 B ER0 T IY2 N Z
+libya L IH1 B IY2 AH0
+libyans L IH1 B IY2 AH0 N Z
+linus L AY1 N AH0 S
+lo L OW1
+lois L OW1 AH0 S
+lozon L OW1 Z AH0 N
+lucius L UW1 SH AH0 S
+luke L UW1 K
+luz L AH1 Z
+lydia L IH1 D IY0 AH0
+macedonia M AE2 S AH0 D OW1 N IY0 AH0
+macedonia(2) M AE2 K AH0 D OW1 N IY0 AH0
+macedonian M AE2 S AH0 D OW1 N Y AH0 N
+macedonian(2) M AE2 K AH0 D OW1 N Y AH0 N
+macedonians M AE2 S AH0 D OW1 N IY0 AH0 N Z
+macedonians(2) M AE2 K AH0 D OW1 N IY0 AH0 N Z
+machi M AA1 K IY0
+magdala M AA0 G D AA1 L AH0
+magdalene M AE1 G D AH0 L IY2 N
+maher M AA1 R
+mahlon M EY1 L AO2 N
+maim M EY1 M
+malta M AO1 L T AH0
+manes M EY1 N Z
+mani M AA1 N IY0
+mara M AA1 R AH0
+marisa M AH0 R IH1 S AH0
+martha M AA1 R TH AH0
+mary M EH1 R IY0
+mash M AE1 SH
+massa M AE1 S AH0
+matthew M AE1 TH Y UW0
+matthias M AH0 TH AY1 AH0 S
+medes M IY1 D Z
+media M IY1 D IY0 AH0
+mehetabel M IH0 HH EH1 T AH0 B IH0 L
+melchizedek M EH2 K IY1 Z EH0 D EH2 K
+memphis M EH1 M F AH0 S
+memphis(2) M EH1 M F IH0 S
+memphis(3) M EH1 M P F AH0 S
+memphis(4) M EH1 M P F IH0 S
+menahem M AH0 N AA1 HH AH0 M
+mercury M ER1 K Y ER0 IY0
+mesopotamia M EH2 S AH0 P AH0 T EY1 M IY0 AH0
+messiah M AH0 S AY1 AH0
+methuselah M AH0 TH Y UW1 Z AH0 L AH0
+mica M AY1 K AH0
+micah M AY1 K AH0
+michael M AY1 K AH0 L
+michal M IH1 CH AH0 L
+migdal M IH1 G D AH0 L
+miriam M IH1 R IY0 AH0 M
+mizar M AY1 Z AA2 R
+moab M OW1 AE0 B
+mordecai M AO1 R D AH0 K AY2
+moses M OW1 Z AH0 S
+moses(2) M OW1 Z IH0 S
+muster M AH1 S T ER0
+myra M AY1 R AH0
+nahum N AE1 HH AH0 M
+naomi N EY0 OW1 M IY0
+narcissus N AA0 R S IH1 S AH0 S
+nathan N EY1 TH AH0 N
+nathanael N AE1 TH AH0 N EY2 L
+nazareth N AE1 Z AH0 R IH0 TH
+neco N IY1 K OW0
+negev N EH1 G EH2 V
+nehemiah N IY2 AH0 M AY1 AH0
+neri N EH1 R IY0
+nicolaus N IH1 K AH0 L AW0 Z
+niger N AY1 JH ER0
+nile N AY1 L
+nimrod N IH1 M R AA0 D
+nineveh N IH1 N AH0 V AH0
+noah N OW1 AH0
+notwithstanding N AA2 T W IH0 TH S T AE1 N D IH0 NG
+nun N AH1 N
+obadiah OW2 B AH0 D AY1 AH0
+oded OW1 D EH0 D
+og AA1 G
+olympian OW0 L IH1 M P IY0 AH0 N
+omar OW1 M AA0 R
+omega OW0 M EH1 G AH0
+omega(2) OW0 M EY1 G AH0
+onan OW1 N AH0 N
+ono OW1 N OW0
+onus OW1 N AH0 S
+oren AO1 R AH0 N
+orion OW0 R AY1 AH0 N
+orion(2) AO0 R AY1 AH0 N
+orpah AO1 R P AA0
+outlaws AW1 T L AO2 Z
+pai P AA1 IY0
+pamper P AE1 M P ER0
+passover P AE1 S OW2 V ER0
+paul P AO1 L
+paulus P AO1 L AH0 S
+pause P AO1 Z
+pentecost P EH1 N T AH0 K AO2 S T
+penuel P EH1 N UH0 L
+perez P EH1 R EH0 Z
+persepolis P ER0 S EH1 P AH0 L AH0 S
+perseus P ER1 S IY0 AH0 S
+persia P ER1 ZH AH0
+persian P ER1 ZH AH0 N
+persians P ER1 ZH AH0 N Z
+persis P ER1 S IH0 S
+peter P IY1 T ER0
+pharaoh F EH1 R OW0
+pharaoh(2) F EY1 R OW0
+phares F EH1 R Z
+pharisee F AA1 R IH0 S IY2
+pharisees F AA1 R IH0 S IY2 Z
+pharoah F EY1 R OW0
+pharoah(2) F EH1 R OW0
+philadelphia F IH2 L AH0 D EH1 L F IY0 AH0
+philemon F AH0 L EY1 M AH0 N
+philip F IH1 L AH0 P
+philip(2) F IH1 L IH0 P
+philippi F IH0 L IH1 P IY0
+philistia F IH0 L IH1 S T IY0 AH0
+philistine F IH1 L AH0 S T IY2 N
+philistines F IH1 L AH0 S T IY2 N Z
+phoebe F IY1 B IY0
+phoenicia F AH0 N IY1 SH AH0
+phoenix F IY1 N IH0 K S
+phrygian F R IH1 JH IY0 AH0 N
+pilate P AY1 L AH2 T
+pleiades P L IY1 AH0 D IY2 Z
+polish P AA1 L IH0 SH
+polish(2) P OW1 L IH0 SH
+pontius P AA1 N T IY2 IH0 S
+preserver P R IY0 Z ER1 V ER0
+preserver(2) P R IH0 Z ER1 V ER0
+preserver(3) P R AH0 Z ER1 V ER0
+priscilla P R IH0 S IH1 L AH0
+ptolemy T AA1 L AH0 M IY0
+pur P ER1
+purim P UH1 R AH0 M
+purim(2) P UH1 R IY0 M
+rabbi R AE1 B AY2
+racal R AE1 K AH0 L
+rachel R EY1 CH AH0 L
+rameses R AE1 M AH0 S IY2 Z
+raphael R AA2 F AY0 EH1 L
+raphael(2) R AA2 F Y EH1 L
+raphael(3) R EY1 F IY0 AH0 L
+raze R EY1 Z
+reba R IY1 B AH0
+reuben R UW1 B AH0 N
+rhoda R OW1 D AH0
+rhodes R OW1 D Z
+rogel R OW1 G AH0 L
+roi R OY1
+roman R OW1 M AH0 N
+romans R OW1 M AH0 N Z
+rome R OW1 M
+rosh R AO1 SH
+rufus R UW1 F AH0 S
+ruth R UW1 TH
+sabbath S AE1 B AH0 TH
+sabbaths S AE1 B AH0 TH S
+sabta S AE1 B T AH0
+salamis S AH0 L AA1 M IY0 Z
+salem S EY1 L AH0 M
+salim S AE1 L IH0 M
+salim(2) S AA0 L IY0 M
+salmon S AE1 M AH0 N
+salome S AH0 L OW1 M IY0
+samaria S EY2 M ER0 IY1 AH0
+samaritan S AH0 M EH1 R IH0 T AH0 N
+samaritans S AH0 M EH1 R IH0 T AH0 N Z
+samos S EY1 M AA0 S
+samson S AE1 M S AH0 N
+samuel S AE1 M Y UW0 L
+sarah S EH1 R AH0
+satan S EY1 T AH0 N
+saul S AO1 L
+scriptures S K R IH1 P CH ER0 Z
+scythian S IH1 TH IY0 AH0 N
+sela S EH1 L AH0
+sergius S ER1 JH Y AH0 S
+seth S EH1 TH
+shahar SH AH0 HH AA1 R
+shamir SH AH0 M IH1 R
+shan SH AE1 N
+sharar SH ER0 AA1 R
+sharon SH AE1 R AH0 N
+sharon(2) SH EH1 R AH0 N
+sharon(3) SH AH0 R OW1 N
+shaul SH AO1 L
+shean SH IY1 N
+sheba SH IY1 B AH0
+shema SH IH0 M AH1
+shen SH EH1 N
+sheth SH EH1 TH
+shibboleth SH IH1 B AH0 L EH2 TH
+shiloh SH AY1 L OW0
+shimon SH IY1 M OW0 N
+shimon(2) SH IY1 M AH0 N
+shur SH ER1
+sidon S AY1 D AH0 N
+silas S AY1 L AH0 S
+simeon S IH1 M IY0 AH0 N
+simon S AY1 M AH0 N
+sinai S AY1 N AY2
+smyrna S M ER1 N AH0
+soco S OW1 K OW1
+soco(2) S AA1 K OW0
+sodom S AO1 D AH0 M
+solomon S AA1 L AH0 M AH0 N
+spain S P EY1 N
+sparta S P AA1 R T AA0
+spartans S P AA1 R T AH0 N Z
+stalwart S T AO1 L W ER0 T
+stephen S T IY1 V AH0 N
+stoic S T OW1 IH0 K
+sur S ER1
+susa S UW1 S AH0
+susanna S UW0 Z AE1 N AH0
+susi S UW1 S IY0
+syracuse S IH1 R AH0 K Y UW2 Z
+syria S IH1 R IY0 AH0
+syrian S IH1 R IY0 AH0 N
+syrians S IH1 R IY0 AH0 N Z
+tabitha T AE1 B IH0 TH AH0
+tabor T EY1 B ER0
+talitha T AE1 L IH0 DH AH0
+tanis T AE1 N IH0 S
+tarsus T AA1 R S AH0 S
+tartan T AA1 R T AH0 N
+taverns T AE1 V ER0 N Z
+tel T EH1 L
+tertius T ER1 T IY0 IH0 S
+tertius(2) T ER1 SH Y IH0 S
+thomas T AA1 M AH0 S
+tidal T AY1 D AH0 L
+tigris T AY1 G R AH0 S
+timon T AY1 M AH0 N
+timothy T IH1 M AH0 TH IY0
+titans T AY1 T AH0 N Z
+titus T AY1 T AH0 S
+tobias T AH0 B AY1 AH0 S
+tolman T AA1 L M AH0 N
+tubal T UW1 B AH0 L
+tuck T AH1 K
+twin T W IH1 N
+tyre T AY1 R
+ulam Y UW1 L AE0 M
+ur ER1
+uri Y ER1 IY0
+urias Y ER0 IY1 AH0 Z
+vashti V AE1 SH T IY0
+vindicate V IH1 N D AH0 K EY0 T
+yah Y AA1
+yahweh Y AA1 W EH2
+zachariah Z AE2 K ER0 AY1 AH0
+zacharias Z AE2 K ER0 AY1 AH0 S
+zachary Z AE1 K ER0 IY0
+zadok Z AA1 D AH0 K
+zecher Z EH1 K ER0
+zedekiah Z EH2 D AH0 K AY1 AH0
+zeeb Z IY1 B
+zelek Z EH1 L IH0 K
+zenas Z IY1 N AH0 Z
+zeus Z UW1 S
+zia Z IY1 AH0
+zillah Z IH1 L AH0
+zion Z AY1 AH0 N
+ziv Z IH1 V
+zorah Z AO1 R AH0

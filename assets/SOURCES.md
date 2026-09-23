@@ -278,3 +278,129 @@ ONNX Runtime, which is a binary obtained separately.
   "Gehenna" wrong; "Yahweh" it reads correctly (YAH-way). Sojourner will
   carry a pronunciation table for the names of scripture, with its source
   recorded here when it is added.
+
+---
+
+## 5. The names of scripture — how the voice says them
+
+espeak-ng reads names by the rules for English spelling and gets many of
+them wrong ("Job" as the word *job*, "Zechariah" with a *ch*). Sojourner
+carries a table, `assets/names.tsv`, of words as spelled in the text and the
+sounds to say them with, in espeak-ng's phoneme mnemonics; every row names
+its source here. The words on the page never change; the table only changes
+what the voice is told (`src/voice/names.rs`). The table is generated from
+the sources below by `tools/names/compose.py` and is not edited by hand.
+
+### Sources
+
+| Id | Work | Obtained | License |
+|---|---|---|---|
+| `cmudict` | The CMU Pronouncing Dictionary, Carnegie Mellon University — https://github.com/cmusphinx/cmudict, file `cmudict.dict` at `master`, 135,166 lines, SHA-256 `81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22`. American English in ARPAbet. Kept in the repository as `assets/names-source/cmudict-names.txt`: the 695 lines whose word is one of the text's proper names, extracted from that file | 2026-09-23, by the author, from GitHub | BSD 2-clause (Copyright 1993–2015 Carnegie Mellon University); the notice is kept as `assets/names-source/LICENSE.cmudict` |
+| `chambers1908` | "Pronouncing Vocabulary of Scripture Proper Names", an appendix of *Chambers's Twentieth Century Dictionary of the English Language*, edited by Thomas Davidson, W. & R. Chambers, 1908 — 621 entries, "all common Scripture Names except monosyllables and dissyllables, the latter being always accented on the first syllable". The Wikisource transcription: https://en.wikisource.org/wiki/Chambers%27s_Twentieth_Century_Dictionary_1908/Pronouncing_Vocabulary_of_Scripture_Proper_Names, page id 1231542, revision 3598679 of 2012-01-27, fetched as wikitext (`action=raw`), 16,339 bytes, SHA-256 `c13a04d17d0134b6084436843877ef2a70e6eda191d8d9115812e656406442b8`, kept as `assets/names-source/chambers-1908-scripture-names.wikitext` with the revision record beside it | 2026-09-23, by the author, from Wikisource | The dictionary is in the public domain (published 1908; its editor died in 1923). Wikisource's transcription is offered under CC BY-SA 4.0; attribution: Wikisource contributors |
+
+The list of names itself — `assets/names-source/web-names.tsv`, 3,840 words
+with counts — is drawn from the text by `cargo run --bin names-list`: every
+capitalized word that never appears in lowercase anywhere in the text, plus
+"Job" (which the heuristic misses because "job" the word occurs twice).
+
+### How a pronunciation is chosen
+
+For each name, in this order (the code is `tools/names/compose.py`):
+
+1. **cmudict, if it has the name** — modern American usage, which is what a
+   listener expects — provided its entry passes two checks: every consonant
+   the spelling has appears in the pronunciation, in order (cmudict's entries
+   for rare names are sometimes garbled: its "Melchizedek" has no *l*), and a
+   two-syllable name is stressed on its first syllable (Chambers's stated rule
+   for scripture names; cmudict's "Gilead" and "Abram" break it and are
+   passed over).
+2. **Chambers, otherwise** — and Chambers over cmudict when both have the
+   name but disagree on its consonants, since Chambers follows the spelling
+   ("Ahasuerus": cmudict has a *sh*).
+3. A row is written only when the voice would otherwise say the name
+   differently: espeak-ng is asked for both renderings and they are compared.
+   Every row in the table changes something.
+
+Decided by hand, the only two: "Job" takes cmudict's second entry (the man,
+`JH OW1 B`; the first is the work), and "Yahweh" is left to the voice, whose
+rendering (YAH-way) the author preferred to cmudict's (YAH-weh).
+
+### Conversion to espeak-ng "en" mnemonics
+
+Both sources are turned into the mnemonics of espeak-ng's `en` voice — the
+voice the model was trained with, so the sounds stay in the model's own
+convention: British-style vowels, and no *r* before a consonant or at the
+end of a word, the way espeak-ng's `en` renders words.
+
+From ARPAbet (`tools/names/cmu.py`):
+
+| ARPAbet | espeak `en` | | ARPAbet | espeak `en` |
+|---|---|---|---|---|
+| AA | A: | | IY | i: |
+| AE | a | | OW | oU |
+| AH0 | @ | | OY | OI |
+| AH1, AH2 | V | | UH | U |
+| AO | O: | | UW | u: |
+| AW | aU | | ER1, ER2 | 3: |
+| AY | aI | | ER0 | @ |
+| EH | E | | ER before a vowel | the above plus r |
+| EY | eI | | consonants | as ARPAbet, except CH→tS, JH→dZ, NG→N, SH→S, TH→T, DH→D, ZH→Z, Y→j, HH→h |
+| IH | I | | stress | `'` before a syllable marked 1, `,` before one marked 2 |
+
+R after a vowel and before a consonant or the end is dropped and colours the
+vowel: A:, a → A:; E, eI → e@; I, i: → i@; O:, oU → O:; U, u: → U@; aI → aI@;
+aU → aU@; V → 3:; @ stays.
+
+From Chambers's respelling (`tools/names/chambers.py`): the entry is split at
+its hyphens and after its stress mark; a parenthetical respelling is laid
+over the syllables it covers (a leading dash: the last syllables, or from the
+stressed one when it carries the mark; a trailing dash: the first; a leading
+mark: the syllables after the stressed one); the first form is taken where
+the entry offers an "or". Then, syllable by syllable: long vowels ā ē ī ō ū
+→ eI i: aI oU ju: (u: after l, r, s, z, sh, ch, j); short vowels stressed a e
+i o u → a E I 0 V, unstressed → @ (i → I; e, i → i before another vowel; a
+final open e, i, o, u → i i oU u:); ai/ay → eI, au → O:, oi → OI, ou/ow → aU,
+oo → u:, ee/ea → i:, ew/eu → ju:, æ/ae → i:, ia/io → i@; consonants by their
+usual sounds with ch → k, c → k, ç → s, ph → f, th → T, g hard, x → ks (gz
+before a stressed vowel), y before a vowel → j; a lone h after a vowel is
+silent; a doubled consonant is one sound; r before a consonant or at the end
+is dropped and colours the vowel as above; a final silent e is dropped
+("-īte"); a plural s after m, n, l, r is z. An entry with no stress mark
+("Nin-e-veh") is stressed on its first syllable, as Chambers's dissyllables
+are. Two entries the rules cannot read are left to the voice: "Appii Forum"
+(two words) and "Higgaion", whose parenthetical does not fit any pattern.
+
+### Coverage, 2026-09-23
+
+Of the text's 3,839 proper names (45,694 occurrences): 682 rows (16,701
+occurrences) — 337 from cmudict, 345 from Chambers; 250 more names the voice
+already says as the sources do; 58 cmudict entries rejected by the checks
+(most of them then covered by Chambers or by the voice); 2,907 names
+(10,817 occurrences) that neither source has, mostly two-syllable names and
+names that occur once, said by espeak-ng's rules. A third source for those,
+or the author's ear on the frequent ones, is the next step.
+
+### Verification
+
+- 2026-09-23: `cargo test` (`tests/names.rs`) proves the mechanism — a
+  table word becomes `[[phonemes]]` before espeak-ng sees the text,
+  possessives folded in (Job’s → `[[dZ'oUbz]]`, Moses’s → …Iz, Lot’s → …s),
+  words that merely begin with a table word untouched, malformed tables
+  refused — and the whole pipeline: "Then Job answered Yahweh." phonemizes
+  to `ðˈɛn dʒˈəʊb ˈansəd jˈɑːweɪ.` where the bare rules gave `dʒˈɒb`. It
+  pins the counts above, checks that every row's word occurs in the text,
+  and that every row changes what the voice says and none comes out spelled
+  letter by letter.
+- The conversion from Chambers was checked against cmudict on the 134 names
+  both have, after the rules above were settled: their consonants agree on
+  all but eight, each a known difference (cmudict's garbled "Melchizedek"
+  and "Ahasuerus"; *s* against *z* in "Artemas", "Salamis", "Syracuse",
+  "Methuselah"; *sh* against *s* or *zh* in "Dionysius", "Persia"), and the
+  stressed syllable differs on about fifteen where the two traditions differ
+  (Chambers "E-lī′sha" and "Del′i-lah", cmudict "EL-i-sha" and "de-LY-lah").
+  Where they differ, the order above decides; the author's ear can overrule
+  it, as a third source.
+- espeak-ng honors `[[ ]]` only with its `option_phoneme_input` global set,
+  which only `espeak_Synth` does; Sojourner sets it once after initializing
+  (`src/voice/phonemes.rs`). An internal of espeak-ng 1.52 as bundled by
+  espeak-rs-sys 0.2.0; the tests above will notice if an update changes it.

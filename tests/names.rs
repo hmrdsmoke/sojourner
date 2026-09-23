@@ -87,8 +87,8 @@ fn how_many_names_the_table_covers() {
         names.len(),
         table.len(),
     );
-    assert_eq!(names.len(), 3_839);
-    assert_eq!(occurrences, 45_694);
+    assert_eq!(names.len(), 3_836);
+    assert_eq!(occurrences, 38_808);
     assert_eq!(covered.len(), table.len(), "every table entry should be a word in the text");
     assert_eq!(table.len(), 682);
     assert_eq!(covered_occurrences, 16_701);

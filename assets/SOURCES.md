@@ -11,20 +11,20 @@ them.
 
 ---
 
-## 1. Bible text — World English Bible (WEB), Classic edition
+## 1. Bible text — World English Bible, Updated edition
 
 | | |
 |---|---|
-| Work | World English Bible, Classic edition ("2020 stable text edition"), full ecumenical book set |
+| Work | World English Bible Updated ("WEBU"), full ecumenical book set |
 | Publisher | eBible.org — Michael Paul Johnson, editor |
-| Home | https://worldenglish.bible — https://ebible.org/web/ |
-| Basis, as stated by the publisher | American Standard Version (1901); Biblia Hebraica Stuttgartensia (Old Testament); Greek Majority Text (New Testament); Deuterocanon from the Revised Version Apocrypha and Brenton's Septuagint |
-| File obtained | https://ebible.org/Scriptures/eng-web_usfm.zip |
-| Obtained | 2026-09-22, by the author, directly from the publisher |
+| Home | https://worldenglish.bible — https://ebible.org/engwebu/ |
+| Basis, as stated by the publisher | American Standard Version (1901); Biblia Hebraica Stuttgartensia (Old Testament); Greek Majority Text (New Testament); Deuterocanon from the Revised Version Apocrypha and Brenton's Septuagint. The Update is the same text as the Classic edition with the divine name rendered "LORD"/"GOD", typo corrections, and "a small number of language updates" (the publisher's FAQ) |
+| File obtained | https://ebible.org/Scriptures/engwebu_usfm.zip |
+| Obtained | 2026-09-23, by the author, directly from the publisher |
 | Publisher build stamp | "HTML generated with Haiola by eBible.org 22 Sep 2026 from source files dated 22 Sep 2026" (from copr.htm) |
-| SHA-256 of the zip | `fc578675b0f8fedbc0120920e53e89060fac4d6499270ab99964b913eaad6d36` |
-| Format | USFM 3, UTF-8. 83 files: front matter, 39 Old Testament books, 15 Deuterocanonical files (some hold several traditional books: Greek Daniel carries Susanna, Bel and the Dragon and the Song of the Three; Baruch carries the Letter of Jeremiah), 27 New Testament books, glossary |
-| License | Public domain, declared by the publisher. The publisher's statement is kept verbatim as `copr.htm` inside the committed zip (unzipped to `assets/web-usfm/` for development) |
+| SHA-256 of the zip | `05d61ed5a91dcae0a66781d71f2f91335c9bf836fc0808d10789b9d51ea19b6f` (3,262,186 bytes) |
+| Format | USFM 3, UTF-8. 83 files: front matter, 39 Old Testament books, 15 Deuterocanonical files (some hold several traditional books: Greek Daniel carries Susanna, Bel and the Dragon and the Song of the Three; Baruch carries the Letter of Jeremiah), 27 New Testament books, glossary. The same marker set as the Classic edition; the divine name is plain capitals in the text, not a marker |
+| License | Public domain, declared by the publisher. The publisher's statement is kept verbatim as `copr.htm` inside the committed zip |
 | Publisher's condition | "World English Bible" is a trademark of eBible.org. The publisher asks that anyone who changes the actual text not call the result the World English Bible |
 | Publisher's signing key | `keys.asc` inside the committed zip (PGP, mljohnson.org) |
 
@@ -35,10 +35,15 @@ them.
   the front matter and the glossary. Nothing added, nothing removed.
 - Does not change the text. The conversion from USFM to Sojourner's internal
   format is done by code in this repository and is verified (below).
-- Keeps the publisher's rendering of the divine name, "Yahweh". The source
-  texts distinguish YHWH from Elohim ("God") and Adonai ("Lord"); the common
-  small-capitals "LORD" convention hides that distinction, and the Classic
-  edition does not use it.
+- Shows the divine name as the publisher sets it: "LORD" and "GOD" in
+  capitals where the Hebrew has the name (YHWH), "Lord" where it has Adonai,
+  so "Lord GOD" and "LORD God" keep the source texts' distinction. The
+  publisher's own footnote at each book's first occurrence explains the
+  convention ("When rendered in ALL CAPITAL LETTERS, “LORD” or “GOD” is the
+  translation of God’s Proper Name (Hebrew “יהוה”, usually pronounced
+  Yahweh)"). On the page the capitals are set as small capitals — the first
+  letter at body size, the rest smaller — which is only typography; the
+  letters are the publisher's.
 - Shelves the Deuterocanon after the New Testament, as a labeled section.
   The publisher's file order places these books between the testaments;
   Sojourner reorders for display only. The books themselves are unchanged.
@@ -48,52 +53,81 @@ them.
   number for "heavens"); it would need its own verification before it could
   be shown.
 
+### History: the Classic edition, 2026-09-22 to 2026-09-23
+
+Sojourner began with the Classic edition (`eng-web_usfm.zip`, 2020 stable
+text, SHA-256 `fc578675b0f8fedbc0120920e53e89060fac4d6499270ab99964b913eaad6d36`,
+obtained 2026-09-22; its HTML rendering `eng-web_html.zip`, SHA-256
+`cf6fec91bc4dc3d18f95faf2da10bc871affae4f9f43f69af3dfd26da0545b63`), which
+renders the divine name "Yahweh". The author chose the Classic for that
+distinction and, on hearing the text read aloud, found "Yahweh God" and
+"Lord Yahweh" read badly; the publisher's FAQ says the same thing about its
+own editions ("we are unifying the handling of the Tetragrammaton… to be
+the same in all variants and dialects except for the classic WEB"), and
+the Updated edition is the publisher's own current text. Both are the
+publisher's; nothing was edited to make the change. The Classic files are
+in the repository's history.
+
+Measured on 2026-09-23 by parsing both editions and comparing every verse
+(38,058 verses, all present in both): 32,213 verses are identical; 5,802
+differ only in the name — "Yahweh" → "the LORD" (or "LORD" in address,
+"THE LORD" where the Classic had capitals), "Yah" → "the LORD" (24 verses),
+"Lord Yahweh" → "Lord GOD", and "Yahweh of Armies" → "the GOD of Armies"
+once (Amos 9:5); 43 differ otherwise, and they are: seven language updates
+(Genesis 2:5 "in the earth" → "on the earth"; Psalm 68:29 "shall" →
+"will"; 1 Maccabees 1:53, 1:56, 1:57 reworded; 2 Maccabees 4:26 and 2
+Esdras 4:9 punctuation), five verses where the Update's file lost the space
+after a footnote (Greek Esther 1:1 "thingsin", 8:13 "theirbenefactors"; 1
+Maccabees 4:40 "trumpets,and"; 1 Esdras 5:8 "Resaias,Eneneus,", 9:27
+"andAedias.") — errors in the publisher's file as shipped, kept as shipped
+and to be reported to the publisher — and eight New Testament verses that end
+with a trailing space (no visible effect). The Update adds 101 footnotes:
+the divine-name note above at each book's first occurrence (58), "Hebrew:
+יה Yah" where the Classic had "Yah" (43), and a few others; hence 1,956
+footnotes and 683,871 word tags against the Classic's 1,855 and 677,690.
+
 ### Verification
 
 - Independent witness: TehShrike/world-english-bible, a separate JSON
-  conversion of the same WEB text (commit `68669ba3be9719ae4d1135b19d9e0b6587b7c356`,
+  conversion of the Classic WEB text (commit `68669ba3be9719ae4d1135b19d9e0b6587b7c356`,
   2025-11-24, https://github.com/TehShrike/world-english-bible). It is not
   shipped with Sojourner and is used only to cross-check Sojourner's own
   conversion. Its package declares no data license, which is one reason it is
   not shipped.
-- 2026-09-22: Sojourner's parser (`src/text/usfm.rs`) and its proof
-  (`tests/witness.rs`, run by `cargo test`) are in place. The census test
-  asserts every count measured on the raw files: 83 books, 1,402 chapters,
-  38,058 verse markers (23,145 OT / 6,955 Deuterocanon / 7,958 NT), 1,855
-  footnotes, 363 cross-references, 677,690 word tags, 23,338 poetry lines,
-  9,254 paragraphs, 1,070 stanza breaks, 139 superscriptions, 6 bridged verse
-  numbers; and that the only empty verses in the Protestant canon are the
-  five footnoted ones listed below.
-- 2026-09-22: verse-by-verse comparison against the JSON witness: all 31,103
-  verses of the 66 Protestant books exist in both, none missing, none extra.
-  The wording differs in 6,362 verses (4,488 punctuation or quote spacing
-  only; 1,874 wording), all in one direction — "in the earth" → "on the
-  earth", "I come quickly" → "I am coming soon", "I will cause the captivity
-  of Judah to return" → "I will restore the fortunes of Judah" — which shows
-  the witness is a pre-2020 snapshot of the WEB, before the publisher's
-  language updates were finished. It therefore proves structure, not
-  wording.
-- 2026-09-22: word-for-word proof against the publisher's own rendering.
-  Witness: the HTML edition of the WEB, generated by the publisher's tool
-  (Haiola) from the same source files as the USFM zip, on the same day.
-  File https://ebible.org/Scriptures/eng-web_html.zip, obtained 2026-09-22
-  by the author, SHA-256
-  `cf6fec91bc4dc3d18f95faf2da10bc871affae4f9f43f69af3dfd26da0545b63`,
-  kept at `assets/eng-web_html.zip` (not shipped; read by the test).
-  Result: all 38,058 verses of all 81 books — Old Testament, Deuterocanon
-  and New Testament — have identical words and punctuation in Sojourner's
-  parse and in the publisher's rendering. The comparison ignores two
-  typographic matters, on both sides equally: whitespace between two
-  adjacent quotation marks (the source writes `’ ”` in three verses and
-  `’”` in 865; the renderer normalizes all of them to a non-breaking space)
-  and whitespace beside an em-dash (the renderer sets "Selah" as its own
-  block, Psalm 68:32). Nothing else is ignored. The renderer's own counts
-  agree with the parser's as well: 38,058 verse spans, 2,290 words-of-Jesus
-  spans, 2,218 note callers (1,855 footnotes + 363 cross-references), and
-  the same number of blocks of every kind.
+- 2026-09-23: Sojourner's parser (`src/text/usfm.rs`), written for the
+  Classic edition, parsed the Updated edition unchanged — the same marker
+  set — and its proof (`tests/witness.rs`, run by `cargo test`) was re-run
+  on it. The census test asserts every count measured on the raw files:
+  83 books, 1,402 chapters, 38,058 verse markers (23,145 OT / 6,955
+  Deuterocanon / 7,958 NT), 1,956 footnotes, 363 cross-references,
+  683,871 word tags, 23,338 poetry lines, 9,254 paragraphs, 1,070 stanza
+  breaks, 139 superscriptions, 6 bridged verse numbers; and that the only
+  empty verses in the Protestant canon are the five footnoted ones listed
+  below. Every count but footnotes and word tags is the Classic's.
+- 2026-09-23: verse-by-verse comparison against the JSON witness: all
+  31,103 verses of the 66 Protestant books exist in both, none missing,
+  none extra. The witness is a pre-2020 snapshot of the Classic, so it
+  proves structure, not wording.
+- 2026-09-23: word-for-word proof against the publisher's own rendering of
+  the Updated edition. Witness: the HTML edition, generated by the
+  publisher's tool (Haiola) from the same source files as the USFM zip, on
+  the same day. File https://ebible.org/Scriptures/engwebu_html.zip,
+  obtained 2026-09-23 by the author, SHA-256
+  `7597dd5bf4004c63a8a207141db512ebece6bb45b4b1a382f033c926bdc3a3be`
+  (5,078,763 bytes), kept at `assets/engwebu_html.zip` (not shipped; read
+  by the test). Result: all 38,058 verses of all 81 books — Old Testament,
+  Deuterocanon and New Testament — have identical words and punctuation in
+  Sojourner's parse and in the publisher's rendering. The comparison
+  ignores two typographic matters, on both sides equally: whitespace
+  between two adjacent quotation marks (the renderer normalizes them to a
+  non-breaking space) and whitespace beside an em-dash (the renderer sets
+  "Selah" as its own block, Psalm 68:32). Nothing else is ignored. The
+  renderer's own counts agree with the parser's as well: 38,058 verse
+  spans, the words-of-Jesus spans, the note callers, and the same number of
+  blocks of every kind.
 - The proof is `cargo test`. With both witness files present it runs four
   checks (census, footnoted-verses, JSON structure, publisher HTML) in
-  about a second; without them, the census and footnoted-verses checks
+  about five seconds; without them, the census and footnoted-verses checks
   still run against the zip compiled into the binary.
 - Text-critical features of the WEB that could be mistaken for missing text,
   each explained by the publisher's own footnote at that verse:
@@ -182,7 +216,12 @@ them.
   hash above is what it must match. `src/voice/files.rs` says where the app
   looks for it.
 - Speaks the words of a verse as printed. Verse numbers, footnote markers
-  and cross-reference markers are not spoken.
+  and cross-reference markers are not spoken. A word set in capitals
+  ("LORD", "GOD", "HOLY TO THE LORD") is read as the word: espeak-ng would
+  spell a short all-capital word after another capitalized one as an
+  acronym ("Lord G-O-D"), so every run of two or more capitals is set to an
+  initial capital before espeak-ng sees it (`src/voice/phonemes.rs`,
+  `as_words`). Speech only; the page keeps the capitals.
 
 ### Verification
 
@@ -295,13 +334,17 @@ the sources below by `tools/names/compose.py` and is not edited by hand.
 
 | Id | Work | Obtained | License |
 |---|---|---|---|
-| `cmudict` | The CMU Pronouncing Dictionary, Carnegie Mellon University — https://github.com/cmusphinx/cmudict, file `cmudict.dict` at `master`, 135,166 lines, SHA-256 `81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22`. American English in ARPAbet. Kept in the repository as `assets/names-source/cmudict-names.txt`: the 695 lines whose word is one of the text's proper names, extracted from that file | 2026-09-23, by the author, from GitHub | BSD 2-clause (Copyright 1993–2015 Carnegie Mellon University); the notice is kept as `assets/names-source/LICENSE.cmudict` |
+| `cmudict` | The CMU Pronouncing Dictionary, Carnegie Mellon University — https://github.com/cmusphinx/cmudict, file `cmudict.dict` at `master`, 135,166 lines, SHA-256 `81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22`. American English in ARPAbet. Kept in the repository as `assets/names-source/cmudict-names.txt`: the 693 lines whose word is one of the text's proper names, extracted from that file, under a two-line header naming the extraction (the Classic edition's extraction had two more, "yah" and "yahweh") | 2026-09-23, by the author, from GitHub | BSD 2-clause (Copyright 1993–2015 Carnegie Mellon University); the notice is kept as `assets/names-source/LICENSE.cmudict` |
 | `chambers1908` | "Pronouncing Vocabulary of Scripture Proper Names", an appendix of *Chambers's Twentieth Century Dictionary of the English Language*, edited by Thomas Davidson, W. & R. Chambers, 1908 — 621 entries, "all common Scripture Names except monosyllables and dissyllables, the latter being always accented on the first syllable". The Wikisource transcription: https://en.wikisource.org/wiki/Chambers%27s_Twentieth_Century_Dictionary_1908/Pronouncing_Vocabulary_of_Scripture_Proper_Names, page id 1231542, revision 3598679 of 2012-01-27, fetched as wikitext (`action=raw`), 16,339 bytes, SHA-256 `c13a04d17d0134b6084436843877ef2a70e6eda191d8d9115812e656406442b8`, kept as `assets/names-source/chambers-1908-scripture-names.wikitext` with the revision record beside it | 2026-09-23, by the author, from Wikisource | The dictionary is in the public domain (published 1908; its editor died in 1923). Wikisource's transcription is offered under CC BY-SA 4.0; attribution: Wikisource contributors |
 
-The list of names itself — `assets/names-source/web-names.tsv`, 3,840 words
+The list of names itself — `assets/names-source/web-names.tsv`, 3,837 words
 with counts — is drawn from the text by `cargo run --bin names-list`: every
 capitalized word that never appears in lowercase anywhere in the text, plus
 "Job" (which the heuristic misses because "job" the word occurs twice).
+Regenerated for the Updated edition on 2026-09-23: the Classic's "Yahweh"
+and "Yah" are gone, and so is "Aedias", which the publisher's lost space in
+1 Esdras 9:27 fused into "andAedias" (section 1); the table came out the
+same 682 rows.
 
 ### How a pronunciation is chosen
 
@@ -321,9 +364,10 @@ For each name, in this order (the code is `tools/names/compose.py`):
    differently: espeak-ng is asked for both renderings and they are compared.
    Every row in the table changes something.
 
-Decided by hand, the only two: "Job" takes cmudict's second entry (the man,
-`JH OW1 B`; the first is the work), and "Yahweh" is left to the voice, whose
-rendering (YAH-way) the author preferred to cmudict's (YAH-weh).
+Decided by hand, the only one: "Job" takes cmudict's second entry (the man,
+`JH OW1 B`; the first is the work). (While the Classic edition was in use,
+"Yahweh" was also left to the voice, whose rendering the author preferred to
+cmudict's; the Updated edition does not print the name.)
 
 ### Conversion to espeak-ng "en" mnemonics
 
@@ -372,11 +416,11 @@ are. Two entries the rules cannot read are left to the voice: "Appii Forum"
 
 ### Coverage, 2026-09-23
 
-Of the text's 3,839 proper names (45,694 occurrences): 682 rows (16,701
-occurrences) — 337 from cmudict, 345 from Chambers; 250 more names the voice
+Of the text's 3,836 proper names (38,808 occurrences): 682 rows (16,701
+occurrences) — 337 from cmudict, 345 from Chambers; 249 more names the voice
 already says as the sources do; 58 cmudict entries rejected by the checks
-(most of them then covered by Chambers or by the voice); 2,907 names
-(10,817 occurrences) that neither source has, mostly two-syllable names and
+(most of them then covered by Chambers or by the voice); 2,906 names
+that neither source has, mostly two-syllable names and
 names that occur once, said by espeak-ng's rules. A third source for those,
 or the author's ear on the frequent ones, is the next step.
 
@@ -388,7 +432,8 @@ or the author's ear on the frequent ones, is the next step.
   words that merely begin with a table word untouched, malformed tables
   refused — and the whole pipeline: "Then Job answered Yahweh." phonemizes
   to `ðˈɛn dʒˈəʊb ˈansəd jˈɑːweɪ.` where the bare rules gave `dʒˈɒb`. It
-  pins the counts above, checks that every row's word occurs in the text,
+  pins the counts above (re-pinned for the Updated edition), checks that
+  every row's word occurs in the text,
   and that every row changes what the voice says and none comes out spelled
   letter by letter.
 - The conversion from Chambers was checked against cmudict on the 134 names

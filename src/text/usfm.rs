@@ -29,7 +29,7 @@ use super::model::*;
 
 /// The publisher's zip, compiled into the binary (3.1 MB). Its SHA-256 is
 /// recorded in assets/SOURCES.md.
-pub const BUNDLED_ZIP: &[u8] = include_bytes!("../../assets/eng-web_usfm.zip");
+pub const BUNDLED_ZIP: &[u8] = include_bytes!("../../assets/engwebu_usfm.zip");
 
 #[derive(Debug)]
 pub enum Error {
@@ -98,7 +98,7 @@ pub fn parse_zip(bytes: &[u8]) -> Result<Bible, Error> {
     Ok(Bible { books })
 }
 
-/// `20-PSAeng-web.usfm` → `Some(20)`. Anything that isn't a `.usfm` file
+/// `20-PSAengwebu.usfm` → `Some(20)`. Anything that isn't a `.usfm` file
 /// (copr.htm, keys.asc, the stylesheet) → `None`.
 fn file_order(name: &str) -> Option<u32> {
     let base = name.rsplit('/').next()?;

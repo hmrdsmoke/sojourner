@@ -46,7 +46,7 @@ OUT = 'assets/names.tsv'
 
 # Decided by hand; the reasons are in SOURCES.md section 5.
 VARIANT = {'Job': 1}       # cmudict's second entry: the man, not the work
-EXCLUDE = {'Yahweh'}       # the voice's own rendering is kept
+EXCLUDE = set()            # names left to the voice on purpose (none, since the Updated edition)
 
 
 def find_espeak():

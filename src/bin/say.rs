@@ -3,7 +3,7 @@
 //! Says something with the bundled voice and writes it to a WAV file, for
 //! listening to a change without opening the app:
 //!
-//!     cargo run --bin say -- "Then Job answered Yahweh." [out.wav]
+//!     cargo run --bin say -- "Then Job answered the LORD." [out.wav]
 //!
 //! The text goes through exactly what the reader uses — the names table,
 //! the phonemizer, the voice — so what you hear is what a verse gets. The

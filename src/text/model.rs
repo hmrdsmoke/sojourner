@@ -4,7 +4,7 @@
 //!
 //! Everything Sojourner puts on a page, reads aloud, or links from is read out
 //! of these types. They are produced once, by the USFM parser (`text::usfm`),
-//! straight from the publisher's files in `assets/eng-web_usfm.zip`, and are
+//! straight from the publisher's files in `assets/engwebu_usfm.zip`, and are
 //! never edited afterwards.
 //!
 //! Two rules shaped this file:
@@ -51,7 +51,7 @@ pub enum Section {
 #[derive(Debug)]
 pub struct Book {
     /// The publisher's file this book was read from, e.g.
-    /// `20-PSAeng-web.usfm`. Kept so any question about a verse can be
+    /// `20-PSAengwebu.usfm`. Kept so any question about a verse can be
     /// traced to a file and line in the source zip.
     pub file: String,
     /// Three-letter USFM code from `\id`: GEN, PSA, JHN, TOB, FRT, GLO…

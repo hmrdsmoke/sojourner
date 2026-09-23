@@ -87,10 +87,42 @@ pub fn init(data_dir: Option<&Path>) -> Result<(), Error> {
 /// ended it, a space after a clause-internal mark (`,` `:` `;`), and a
 /// sentence ending at `.` `?` `!` or the end of the text. `voice` is the
 /// espeak-ng voice named in the model's configuration ("en"). Names in the
-/// bundled table (`names.rs`) are said as the table says.
+/// bundled table (`names.rs`) are said as the table says, and words set in
+/// capitals are read as words.
 pub fn sentences(text: &str, voice: &str) -> Result<Vec<String>, Error> {
-    let respelled = Names::bundled().respell(text);
+    let respelled = Names::bundled().respell(&as_words(text));
     sentences_of(&respelled, voice)
+}
+
+/// A word set in capitals — the text's "LORD" and "GOD" for the divine
+/// name, "HOLY TO THE LORD" on the high priest's plate — read as the word
+/// it is, not as letters. espeak-ng takes a short all-capital word after
+/// another capitalized word for an acronym and spells it ("Lord G-O-D"),
+/// so every run of two or more capitals is set to an initial capital
+/// before espeak-ng sees it. Speech only; the page keeps the capitals.
+pub fn as_words(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut word = String::new();
+    let flush = |word: &mut String, out: &mut String| {
+        if word.chars().count() >= 2 && word.chars().all(|c| c.is_uppercase()) {
+            let mut chars = word.chars();
+            out.extend(chars.next());
+            out.extend(chars.flat_map(char::to_lowercase));
+        } else {
+            out.push_str(word);
+        }
+        word.clear();
+    };
+    for c in text.chars() {
+        if c.is_alphabetic() {
+            word.push(c);
+        } else {
+            flush(&mut word, &mut out);
+            out.push(c);
+        }
+    }
+    flush(&mut word, &mut out);
+    out
 }
 
 /// `sentences`, with the text taken as it is — no name table.

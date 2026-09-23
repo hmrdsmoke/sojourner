@@ -20,9 +20,9 @@ fn a_comma_is_kept_and_the_words_stay_apart() {
 
 #[test]
 fn sentences_are_split_at_their_ends() {
-    let s = say("Yahweh is my shepherd: I shall lack nothing. He makes me lie down in green pastures.");
+    let s = say("The LORD is my shepherd: I shall lack nothing. He makes me lie down in green pastures.");
     assert_eq!(s.len(), 2, "{s:?}");
-    assert_eq!(s[0], "jˈɑːweɪ ɪz maɪ ʃˈɛpəd: aɪʃˌal lˈak nˈʌθɪŋ.");
+    assert_eq!(s[0], "ðə lˈɔːd ɪz maɪ ʃˈɛpəd: aɪʃˌal lˈak nˈʌθɪŋ.");
     assert_eq!(s[1], "hiː mˌeɪks mˌiː lˈaɪ dˌaʊn ɪn ɡɹˈiːn pˈastʃəz.");
 
     let s = say("Is it not so? Yes! It is.");
@@ -49,6 +49,17 @@ fn the_publishers_typography_is_understood() {
     // A verse that ends without a full stop, as many do.
     let s = say("Blessed is the man who doesn’t walk in the counsel of the wicked, nor stand on the path of sinners;");
     assert_eq!(s, vec!["blˈɛst ɪz ðə mˈan hˌuː dˈʌzənt wˈɔːk ɪnðə kˈaʊnsəl ɒvðə wˈɪkɪd, nˈɔː stˈand ɒnðə pˈaθ ɒv sˈɪnəz;"]);
+}
+
+/// Words set in capitals are read as words: "GOD" after "Lord" would
+/// otherwise be spelled G-O-D.
+#[test]
+fn capitals_are_read_as_words() {
+    assert_eq!(phonemes::as_words("Thus says the Lord GOD: HOLY TO THE LORD. Job’s LXX"), "Thus says the Lord God: Holy To The Lord. Job’s Lxx");
+    let s = say("Thus says the Lord GOD.");
+    assert_eq!(s, vec!["ðˈʌs sˈɛz ðə lˈɔːd ɡˈɒd."]);
+    let s = say("The LORD is my shepherd; I shall lack nothing.");
+    assert_eq!(s, vec!["ðə lˈɔːd ɪz maɪ ʃˈɛpəd; aɪʃˌal lˈak nˈʌθɪŋ."]);
 }
 
 #[test]

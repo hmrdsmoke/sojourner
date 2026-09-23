@@ -32,7 +32,7 @@ fn the_voice_speaks() {
     let mut voice = PiperVoice::open(&model, &config).unwrap_or_else(|e| panic!("{e}"));
     let loaded = started.elapsed();
     let audio = voice
-        .speak("Yahweh is my shepherd: I shall lack nothing. He makes me lie down in green pastures.")
+        .speak("The LORD is my shepherd; I shall lack nothing. He makes me lie down in green pastures.")
         .unwrap_or_else(|e| panic!("{e}"));
     let spoken = started.elapsed() - loaded;
 

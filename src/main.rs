@@ -107,6 +107,10 @@ const QUOTE_CHARS: usize = 260;
 /// How far one press of Up or Down scrolls the page: two lines of body text.
 const SCROLL_STEP: f32 = BODY * 1.5 * 2.0;
 
+/// Small capitals ("LORD"): the letters after the first, as a share of the
+/// body size.
+const SMALL_CAPS: f32 = 0.8;
+
 // ────────────────────────────────────────────────────────────────────────────
 // State
 // ────────────────────────────────────────────────────────────────────────────
@@ -907,7 +911,7 @@ fn title_page<'a>(palette: &Palette) -> Element<'a, Message> {
         space::vertical().height(6),
         text("World English Bible").size(18).font(SERIF),
         space::vertical().height(28),
-        text("Classic edition · Public domain · eBible.org").size(13).class(palette.muted),
+        text("Updated edition · Public domain · eBible.org").size(13).class(palette.muted),
         text("Cross-references from openbible.info, CC BY 4.0").size(13).class(palette.muted),
         space::vertical().height(40),
         text("Turn the page with → or Next").size(13).class(palette.muted),
@@ -1390,18 +1394,29 @@ fn flow<'a>(
                 spans.push(span("\u{2009}")); // a thin space between number and word
             }
             Inline::Text(run) => {
-                let mut s = span(run.text.as_str()).font(match run.style {
+                let run_font = match run.style {
                     TextStyle::Selah | TextStyle::Hebrew | TextStyle::NoteQuote | TextStyle::NoteAlternate => SERIF_ITALIC,
                     TextStyle::Keyword => Font::DEFAULT,
                     _ => font,
-                });
-                if run.style == TextStyle::WordsOfJesus {
-                    s = s.color(palette.red_letter);
+                };
+                let spoken = cursor.as_deref().is_some_and(LinkCursor::in_spoken);
+                // The divine name is set in capitals in the text ("LORD",
+                // "GOD"); a printed Bible sets it in small capitals. Rich
+                // text has no small-caps face, so the word's first letter
+                // keeps the body size and the rest are set smaller.
+                for (piece, small) in small_capitals(&run.text) {
+                    let mut s = span(piece).font(run_font);
+                    if small {
+                        s = s.size(size * SMALL_CAPS);
+                    }
+                    if run.style == TextStyle::WordsOfJesus {
+                        s = s.color(palette.red_letter);
+                    }
+                    if spoken {
+                        s = s.background(palette.spoken);
+                    }
+                    spans.push(s);
                 }
-                if cursor.as_deref().is_some_and(LinkCursor::in_spoken) {
-                    s = s.background(palette.spoken);
-                }
-                spans.push(s);
             }
             Inline::Footnote(_) => {
                 let mut s = span("†").size(VERSE_NUMBER).color(palette.accent).font(Font::DEFAULT);
@@ -1431,6 +1446,36 @@ fn flow<'a>(
         .line_height(line)
         .font(font)
         .on_link_click(Message::Follow)
+}
+
+/// Small capitals, faked: a word set in capitals ("LORD", "GOD") is split
+/// into its first letter, kept at body size, and the rest, set at
+/// `SMALL_CAPS` of it — "L" + "ORD". Everything else passes through whole.
+/// The pieces are slices of the run, in order; the flag says which are the
+/// small ones.
+fn small_capitals(text: &str) -> Vec<(&str, bool)> {
+    let mut pieces = Vec::new();
+    let mut start = 0;
+    let mut i = 0;
+    while i < text.len() {
+        // A run of letters.
+        let word_end = text[i..].find(|c: char| !c.is_alphabetic()).map_or(text.len(), |n| i + n);
+        if word_end > i && word_end - i >= 2 && text[i..word_end].chars().all(char::is_uppercase) {
+            let first = text[i..].chars().next().unwrap().len_utf8();
+            if i > start {
+                pieces.push((&text[start..i], false));
+            }
+            pieces.push((&text[i..i + first], false));
+            pieces.push((&text[i + first..word_end], true));
+            start = word_end;
+        }
+        // Skip past this word (or this one non-letter character).
+        i = if word_end > i { word_end } else { i + text[i..].chars().next().map_or(1, char::len_utf8) };
+    }
+    if start < text.len() {
+        pieces.push((&text[start..], false));
+    }
+    pieces
 }
 
 /// A footnote's runs as rich text: `\fq` and `\fqa` in italic, Hebrew words

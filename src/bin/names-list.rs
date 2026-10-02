@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/bin/names-list.rs
+// src/bin/names-list.rs
 
 //! Lists the text's proper names for the names tool (tools/names/compose.py):
 //! every capitalized word that never appears in lowercase anywhere in the

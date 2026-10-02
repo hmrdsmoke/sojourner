@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/voice/reader.rs
+// src/voice/reader.rs
 
 //! Reading along: a worker that speaks a list of verses one at a time and
 //! says which one it is on, so the page can follow.

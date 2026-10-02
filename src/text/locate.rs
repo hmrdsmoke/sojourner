@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/text/locate.rs
+// src/text/locate.rs
 
 //! Finding things in the text: one verse's content by reference, a
 //! human-readable label for a reference or a range, and the translators' own

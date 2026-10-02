@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/voice/names.rs
+// src/voice/names.rs
 
 //! The names of scripture, said right.
 //!

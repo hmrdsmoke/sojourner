@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/tests/locate.rs
+// tests/locate.rs
 
 //! Proof for the lookup side: that finding a verse by reference returns the
 //! same words as walking the chapter, that ranges walk in reading order, and

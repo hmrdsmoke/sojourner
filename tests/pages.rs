@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/tests/pages.rs
+// tests/pages.rs
 
 //! The pages: proof that dealing a chapter onto sheets loses nothing,
 //! doubles nothing, and fills no sheet past its bottom.

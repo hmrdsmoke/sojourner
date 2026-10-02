@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/tests/voice.rs
+// tests/voice.rs
 
 //! Proof that the voice speaks: with the voice files and ONNX Runtime in
 //! place (see src/voice/files.rs for where), synthesize one line of Psalm 23

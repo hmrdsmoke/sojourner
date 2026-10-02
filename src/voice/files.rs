@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/voice/files.rs
+// src/voice/files.rs
 
 //! Where the voice and the runtime library live.
 //!

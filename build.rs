@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/build.rs
+// build.rs
 
 //! Build script. One job: finish a link that espeak-rs-sys leaves undone.
 //!

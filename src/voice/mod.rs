@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/voice/mod.rs
+// src/voice/mod.rs
 
 //! Speech: turning the words of a verse into sound.
 //!

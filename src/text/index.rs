@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/text/index.rs
+// src/text/index.rs
 
 //! A lookup table over the parsed Bible: which books exist (by code), and
 //! which (book, chapter, verse) triples exist. Anything that points *into*

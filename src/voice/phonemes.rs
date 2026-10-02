@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/voice/phonemes.rs
+// src/voice/phonemes.rs
 
 //! Words to phonemes, the way Piper's own program does it — with the
 //! punctuation kept.

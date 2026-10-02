@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/bin/say.rs
+// src/bin/say.rs
 
 //! Says something with the bundled voice and writes it to a WAV file, for
 //! listening to a change without opening the app:

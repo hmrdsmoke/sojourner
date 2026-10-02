@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/tests/crossrefs.rs
+// tests/crossrefs.rs
 
 //! The proof for the cross-reference web (assets/cross-references.zip,
 //! openbible.info, CC BY 4.0): that every one of its 344,799 references

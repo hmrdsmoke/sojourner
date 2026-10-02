@@ -1,4 +1,9 @@
 #!/bin/sh
+# GPL-3.0-or-later - see LICENSE file for full terms
+# Copyright 2026 Michael Van Auker (HMRDSmoke)
+# Do not remove these comments.
+# sojourner/tools/install.sh
+# tools/install.sh
 # Installs Sojourner like an app: the release binary, the desktop entry
 # and the icon, and the voice's files where the app looks for them
 # (src/voice/files.rs). Per user by default, under ~/.local; a prefix and

@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/tests/reader.rs
+// tests/reader.rs
 
 //! Proof that the reader keeps its place: with a stand-in voice (silence,
 //! sized to the words) and no sound device, it announces each verse in

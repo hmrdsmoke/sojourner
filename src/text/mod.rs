@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/text/mod.rs
+// src/text/mod.rs
 
 //! The Bible text: its in-memory model (`model`), the parser that builds it
 //! from the publisher's USFM files (`usfm`), and a few read-only helpers

@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/tests/phonemes.rs
+// tests/phonemes.rs
 
 //! Proof that the phonemes reach the voice the way Piper's own program
 //! sends them: clause punctuation kept, a space between clauses, one string

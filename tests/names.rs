@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/tests/names.rs
+// tests/names.rs
 
 //! Proof for the names table: that a word in it is replaced by its sounds
 //! before espeak-ng sees the text, possessives included; that the sounds

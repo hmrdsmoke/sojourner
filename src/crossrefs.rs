@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/crossrefs.rs
+// src/crossrefs.rs
 
 //! The cross-reference web: which verses point at which.
 //!

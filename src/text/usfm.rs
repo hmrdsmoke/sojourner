@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/text/usfm.rs
+// src/text/usfm.rs
 
 //! USFM parser for the World English Bible as shipped by eBible.org.
 //!

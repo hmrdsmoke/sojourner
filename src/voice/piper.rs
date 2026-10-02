@@ -1,4 +1,8 @@
-// ── Add your header block above ──
+// GPL-3.0-or-later - see LICENSE file for full terms
+// Copyright 2026 Michael Van Auker (HMRDSmoke)
+// Do not remove these comments.
+// sojourner/src/voice/piper.rs
+// src/voice/piper.rs
 
 //! The piper engine: a VITS voice model run by ONNX Runtime, with espeak-ng
 //! turning words into phonemes first. Everything runs on this machine.
